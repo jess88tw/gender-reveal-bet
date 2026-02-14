@@ -21,24 +21,24 @@ export class AdminService {
 
   getAllBets(): Observable<{ bets: Bet[] }> {
     return this.http
-      .get<{ bets: Bet[] }>(`${this.apiUrl}/bets`, { withCredentials: true })
+      .get<{ bets: Bet[] }>(`${this.apiUrl}/all-bets`, { withCredentials: true })
       .pipe(tap((response) => this.allBetsSignal.set(response.bets)));
   }
 
   confirmPayment(betId: string): Observable<{ message: string; bet: Bet }> {
     return this.http.patch<{ message: string; bet: Bet }>(
-      `${this.apiUrl}/bets/${betId}/confirm-payment`,
+      `${this.apiUrl}/confirm-payment/${betId}`,
       {},
       { withCredentials: true },
     );
   }
 
-  getRevealConfig(): Observable<RevealConfig> {
+  getRevealConfig(): Observable<{ config: RevealConfig }> {
     return this.http
-      .get<RevealConfig>(`${this.apiUrl}/reveal-config`, {
+      .get<{ config: RevealConfig }>(`${this.apiUrl}/reveal-status`, {
         withCredentials: true,
       })
-      .pipe(tap((config) => this.revealConfigSignal.set(config)));
+      .pipe(tap((res) => this.revealConfigSignal.set(res.config)));
   }
 
   revealGender(
@@ -86,6 +86,14 @@ export class AdminService {
   deleteClue(id: string): Observable<{ message: string }> {
     return this.http.delete<{ message: string }>(
       `${environment.apiUrl}/clues/${id}`,
+      { withCredentials: true },
+    );
+  }
+
+  clearData(): Observable<{ message: string; deleted: { bets: number; revealConfig: number; users: number } }> {
+    return this.http.post<{ message: string; deleted: { bets: number; revealConfig: number; users: number } }>(
+      `${this.apiUrl}/clear-data`,
+      {},
       { withCredentials: true },
     );
   }

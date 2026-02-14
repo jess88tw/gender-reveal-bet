@@ -185,4 +185,25 @@ router.patch('/confirm-payment/:betId', requireAuth, requireAdmin, async (req: R
   }
 });
 
+// 清空所有資料（管理員，開發用）
+router.post('/clear-data', requireAuth, requireAdmin, async (req: Request, res: Response) => {
+  try {
+    const bets = await prisma.bet.deleteMany();
+    const config = await prisma.revealConfig.deleteMany();
+    const users = await prisma.user.deleteMany();
+
+    res.json({
+      message: 'All data cleared',
+      deleted: {
+        bets: bets.count,
+        revealConfig: config.count,
+        users: users.count,
+      },
+    });
+  } catch (error) {
+    console.error('Clear data error:', error);
+    res.status(500).json({ error: 'Failed to clear data' });
+  }
+});
+
 export default router;

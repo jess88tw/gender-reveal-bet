@@ -60,8 +60,7 @@ export interface Participant {
   id: string;
   name: string;
   avatarUrl?: string;
-  boyTickets: number;
-  girlTickets: number;
+  gender: 'BOY' | 'GIRL' | null;
 }
 
 export interface LoginResponse {

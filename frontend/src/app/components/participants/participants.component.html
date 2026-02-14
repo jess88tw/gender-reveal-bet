@@ -26,19 +26,16 @@
     <div class="sort-options">
       <span>排序：</span>
       <button
-        [class.active]="sortBy() === 'total'"
-        (click)="setSortBy('total')"
+        [class.active]="sortBy() === 'name'"
+        (click)="setSortBy('name')"
       >
-        總籤數
-      </button>
-      <button [class.active]="sortBy() === 'boy'" (click)="setSortBy('boy')">
-        👦 男生
-      </button>
-      <button [class.active]="sortBy() === 'girl'" (click)="setSortBy('girl')">
-        👧 女生
-      </button>
-      <button [class.active]="sortBy() === 'name'" (click)="setSortBy('name')">
         名字
+      </button>
+      <button
+        [class.active]="sortBy() === 'gender'"
+        (click)="setSortBy('gender')"
+      >
+        性別
       </button>
     </div>
 
@@ -60,17 +57,15 @@
           </div>
           <div class="info">
             <p class="name">{{ participant.name }}</p>
-            <p class="total">{{ getTotalTickets(participant) }} 張籤</p>
-          </div>
-          <div class="bets">
-            @if (participant.boyTickets > 0) {
-              <span class="bet-badge boy">👦 {{ participant.boyTickets }}</span>
-            }
-            @if (participant.girlTickets > 0) {
-              <span class="bet-badge girl"
-                >👧 {{ participant.girlTickets }}</span
-              >
-            }
+            <p class="total">
+              @if (participant.gender === 'BOY') {
+                👦 押男生
+              } @else if (participant.gender === 'GIRL') {
+                👧 押女生
+              } @else {
+                尚未下注
+              }
+            </p>
           </div>
         </div>
       }

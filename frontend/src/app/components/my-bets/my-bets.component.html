@@ -15,86 +15,50 @@
       <p>載入中...</p>
     </div>
   } @else {
-    <!-- Summary Cards -->
-    <div class="summary-cards">
-      <div class="summary-card boy-card">
-        <span class="icon">👦</span>
-        <div class="info">
-          <p class="label">男生</p>
-          <p class="value">{{ getTotalByGender("BOY").tickets }} 張籤</p>
-          <p class="amount">
-            NT$ {{ getTotalByGender("BOY").amount | number }}
-          </p>
-        </div>
-      </div>
-      <div class="summary-card girl-card">
-        <span class="icon">👧</span>
-        <div class="info">
-          <p class="label">女生</p>
-          <p class="value">{{ getTotalByGender("GIRL").tickets }} 張籤</p>
-          <p class="amount">
-            NT$ {{ getTotalByGender("GIRL").amount | number }}
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Total -->
-    <div class="total-section">
-      <p>
-        總計: <strong>{{ totalTickets }} 張籤</strong> /
-        <strong>NT$ {{ totalAmount | number }}</strong>
-      </p>
-    </div>
-
-    <!-- Bet List -->
     @if (myBets().length === 0) {
       <div class="empty-state">
         <p>您還沒有下注記錄</p>
         <a routerLink="/bet" class="btn btn-primary">立即下注</a>
       </div>
     } @else {
-      <div class="bet-list">
-        <h3>下注記錄</h3>
-        @for (bet of myBets(); track bet.id) {
-          <div
-            class="bet-item"
-            [class.boy]="bet.gender === 'BOY'"
-            [class.girl]="bet.gender === 'GIRL'"
-          >
-            <div class="bet-icon">
-              {{ bet.gender === "BOY" ? "👦" : "👧" }}
-            </div>
-            <div class="bet-info">
-              <p class="bet-gender">
-                {{ bet.gender === "BOY" ? "男生" : "女生" }}
-              </p>
-              <p class="bet-details">
-                {{ bet.ticketCount }} 張籤 • NT$ {{ bet.amount | number }}
-              </p>
-              <p class="bet-date">
-                {{ bet.createdAt | date: "yyyy/MM/dd HH:mm" }}
-              </p>
-            </div>
-            <div
-              class="bet-status"
-              [class.paid]="bet.isPaid"
-              [class.unpaid]="!bet.isPaid"
-            >
-              @if (bet.isPaid) {
-                ✓ 已付款
-              } @else {
-                待付款
-              }
-            </div>
+      <!-- My Bet Info -->
+      @for (bet of myBets(); track bet.id) {
+        <div class="my-bet-card" [class.boy]="bet.gender === 'BOY'" [class.girl]="bet.gender === 'GIRL'">
+          <div class="bet-icon">
+            {{ bet.gender === 'BOY' ? '👦' : '👧' }}
           </div>
-        }
-      </div>
-    }
+          <div class="bet-info">
+            <p class="bet-gender">
+              我押 {{ bet.gender === 'BOY' ? '男生' : '女生' }}
+            </p>
+            <p class="bet-amount">NT$ {{ bet.amount | number }}</p>
+            <p class="bet-date">
+              {{ bet.createdAt | date:'yyyy/MM/dd HH:mm' }}
+            </p>
+          </div>
+          <div
+            class="bet-status"
+            [class.paid]="bet.isPaid"
+            [class.unpaid]="!bet.isPaid"
+          >
+            @if (bet.isPaid) {
+              ✓ 已付款
+            } @else {
+              待付款
+            }
+          </div>
+        </div>
+      }
 
-    <!-- Action Button -->
-    <div class="action-section">
-      <a routerLink="/bet" class="btn btn-primary">繼續下注</a>
-    </div>
+      @if (!myBets()[0].isPaid) {
+        <div class="payment-reminder">
+          <h4>💳 付款提醒</h4>
+          <p>請於下注後 3 日內完成付款</p>
+          <!-- TODO: 把敏感資料都放到一個 config 或環境變數中 -->
+          <p>匯款帳號: XXX-XXXX-XXXX-XXXX</p>
+          <p>匯款後請通知主辦人確認</p>
+        </div>
+      }
+    }
   }
 </div>

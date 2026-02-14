@@ -1,0 +1,178 @@
+<div class="admin-container">
+  <header class="page-header">
+    <a routerLink="/" class="back-btn">← 返回</a>
+    <h1>⚙️ 管理員後台</h1>
+  </header>
+
+  @if (!isLoggedIn()) {
+    <div class="login-prompt">
+      <p>請先登入管理員帳號</p>
+      <a routerLink="/" class="btn btn-primary">返回首頁登入</a>
+    </div>
+  } @else if (loading()) {
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>載入中...</p>
+    </div>
+  } @else if (error()) {
+    <div class="error-banner">
+      <p>⚠️ {{ error() }}</p>
+      <button (click)="loadData()" class="btn btn-small">重試</button>
+    </div>
+  } @else {
+    <!-- Success/Error Messages -->
+    @if (successMessage()) {
+      <div class="success-banner">
+        <p>✅ {{ successMessage() }}</p>
+        <button (click)="clearMessages()" class="close-btn">✕</button>
+      </div>
+    }
+
+    <!-- Stats Overview -->
+    <section class="stats-overview">
+      <h2>📊 下注統計</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-number">{{ totalBets() }}</span>
+          <span class="stat-label">總下注數</span>
+        </div>
+        <div class="stat-card paid">
+          <span class="stat-number">{{ paidBets().length }}</span>
+          <span class="stat-label">已付款</span>
+        </div>
+        <div class="stat-card unpaid">
+          <span class="stat-number">{{ unpaidBets().length }}</span>
+          <span class="stat-label">待付款</span>
+        </div>
+        <div class="stat-card pool">
+          <span class="stat-number">NT$ {{ totalPool() | number }}</span>
+          <span class="stat-label">獎金池</span>
+        </div>
+      </div>
+      <div class="gender-stats">
+        <div class="gender-stat boy">
+          <span>👦 男生：{{ boyBets().length }} 注</span>
+        </div>
+        <div class="gender-stat girl">
+          <span>👧 女生：{{ girlBets().length }} 注</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bet Management -->
+    <section class="bet-management">
+      <h2>💳 下注管理</h2>
+      @if (allBets().length === 0) {
+        <p class="empty">目前沒有下注記錄</p>
+      } @else {
+        <div class="bet-table">
+          @for (bet of allBets(); track bet.id) {
+            <div class="bet-row" [class.paid]="bet.isPaid" [class.unpaid]="!bet.isPaid">
+              <div class="bet-user">
+                <strong>{{ bet.user?.name || '未知' }}</strong>
+                <small>{{ bet.user?.email }}</small>
+              </div>
+              <div class="bet-gender">
+                {{ bet.gender === 'BOY' ? '👦 男生' : '👧 女生' }}
+              </div>
+              <div class="bet-amount">
+                NT$ {{ bet.amount | number }}
+              </div>
+              <div class="bet-date">
+                {{ bet.createdAt | date:'MM/dd HH:mm' }}
+              </div>
+              <div class="bet-action">
+                @if (bet.isPaid) {
+                  <span class="status-badge paid">✓ 已付款</span>
+                } @else {
+                  <button
+                    class="btn btn-confirm"
+                    (click)="confirmPayment(bet)"
+                    [disabled]="actionLoading()"
+                  >
+                    確認付款
+                  </button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </section>
+
+    <!-- Reveal & Draw Section -->
+    <section class="reveal-section">
+      <h2>🎉 揭曉 & 抽獎</h2>
+
+      @if (revealConfig()?.isRevealed) {
+        <!-- Already Revealed -->
+        <div class="revealed-info">
+          <p class="revealed-gender">
+            已揭曉：{{ revealConfig()!.revealedGender === 'BOY' ? '👦 男生' : '👧 女生' }}
+          </p>
+
+          @if (revealConfig()!.winnerId) {
+            <div class="winner-info">
+              <p>🏆 得獎者已抽出</p>
+              @if (drawResult()) {
+                <div class="winner-detail">
+                  <p class="winner-name">🎊 {{ drawResult().winner.name }}</p>
+                  <p>總獎金池：NT$ {{ drawResult().totalPool | number }}</p>
+                  <p>手續費 (10%)：NT$ {{ drawResult().fee | number }}</p>
+                  <p class="prize-amount">得主獎金：NT$ {{ drawResult().winnerPrize | number }}</p>
+                </div>
+              }
+            </div>
+          } @else {
+            <!-- Draw Winner -->
+            <div class="draw-section">
+              <p>猜對人數：{{ revealConfig()!.revealedGender === 'BOY' ? boyBets().length : girlBets().length }} 人</p>
+              <button
+                class="btn btn-draw"
+                (click)="drawWinner()"
+                [disabled]="actionLoading()"
+              >
+                🎲 抽出得獎者
+              </button>
+            </div>
+          }
+        </div>
+      } @else {
+        <!-- Not Yet Revealed -->
+        <div class="reveal-actions">
+          <p>選擇寶寶的性別來揭曉：</p>
+          <div class="reveal-buttons">
+            <button
+              class="btn btn-reveal boy"
+              (click)="revealGender('BOY')"
+              [disabled]="actionLoading()"
+            >
+              👦 揭曉為男生
+            </button>
+            <button
+              class="btn btn-reveal girl"
+              (click)="revealGender('GIRL')"
+              [disabled]="actionLoading()"
+            >
+              👧 揭曉為女生
+            </button>
+          </div>
+          <p class="warning">⚠️ 揭曉後無法修改，下注將關閉</p>
+        </div>
+      }
+    </section>
+
+    <!-- Dev Tools -->
+    <section class="dev-section">
+      <h2>🛠️ 開發工具</h2>
+      <p class="dev-warning">以下操作僅供開發測試使用</p>
+      <button
+        class="btn btn-danger"
+        (click)="clearAllData()"
+        [disabled]="actionLoading()"
+      >
+        🗑️ 清空所有資料
+      </button>
+    </section>
+  }
+</div>

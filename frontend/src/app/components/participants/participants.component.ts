@@ -15,7 +15,7 @@ export class ParticipantsComponent implements OnInit {
 
   participants = this.betService.participants;
   loading = signal(true);
-  sortBy = signal<'name' | 'total' | 'boy' | 'girl'>('total');
+  sortBy = signal<'name' | 'gender'>('name');
 
   sortedParticipants = computed(() => {
     const list = [...this.participants()];
@@ -23,15 +23,11 @@ export class ParticipantsComponent implements OnInit {
 
     return list.sort((a, b) => {
       switch (sort) {
+        case 'gender':
+          return (a.gender || '').localeCompare(b.gender || '');
         case 'name':
-          return a.name.localeCompare(b.name);
-        case 'boy':
-          return b.boyTickets - a.boyTickets;
-        case 'girl':
-          return b.girlTickets - a.girlTickets;
-        case 'total':
         default:
-          return b.boyTickets + b.girlTickets - (a.boyTickets + a.girlTickets);
+          return a.name.localeCompare(b.name);
       }
     });
   });
@@ -51,15 +47,11 @@ export class ParticipantsComponent implements OnInit {
     });
   }
 
-  setSortBy(sort: 'name' | 'total' | 'boy' | 'girl'): void {
+  setSortBy(sort: 'name' | 'gender'): void {
     this.sortBy.set(sort);
   }
 
   getInitials(name: string): string {
     return name.charAt(0).toUpperCase();
-  }
-
-  getTotalTickets(p: { boyTickets: number; girlTickets: number }): number {
-    return p.boyTickets + p.girlTickets;
   }
 }
