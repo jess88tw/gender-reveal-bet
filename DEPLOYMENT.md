@@ -44,7 +44,7 @@ DATABASE_URL=<你的 MongoDB Atlas 連線字串>
 NODE_ENV=production
 FRONTEND_URL=<你的前端網址>
 GOOGLE_CLIENT_ID=<Google OAuth Client ID>
-GOOGLE_CLIENT_SECRET=<Google OAuth Secret>
+ADMIN_EMAILS=<管理員 Email，多位用逗號分隔>
 SESSION_SECRET=<隨機產生的密鑰>
 PORT=3333
 ```
@@ -69,9 +69,9 @@ npm i -g vercel
 ```bash
 cd frontend
 
-# 更新環境變數
-# 編輯 src/environments/environment.prod.ts
-# 將 apiUrl 改為你的後端 URL
+# 前端不需要額外設定環境變數
+# Google Client ID 等設定會自動從後端 /api/config 取得
+# 只需確認 environment.prod.ts 中的 apiUrl 指向你的後端 URL
 
 # 建置
 ng build --configuration production
@@ -80,11 +80,18 @@ ng build --configuration production
 vercel
 ```
 
-### 3. 設定環境變數
+### 3. 環境設定
 
-在 Vercel Dashboard 設定:
+前端的 `src/environments/environment.prod.ts` 只需設定 `apiUrl`：
 
-- `GOOGLE_CLIENT_ID`: 你的 Google OAuth Client ID
+```typescript
+export const environment = {
+  production: true,
+  apiUrl: "https://your-backend-domain.railway.app/api",
+};
+```
+
+所有個人化設定（Google Client ID、Admin Emails）都由後端統一提供。
 
 ## Google OAuth 設定
 
@@ -108,8 +115,9 @@ vercel
 
 ### 3. 取得憑證
 
-- 複製 Client ID 和 Client Secret
-- 將它們分別設定到前端和後端的環境變數
+- 複製 Client ID
+- 將它設定到後端環境變數 `GOOGLE_CLIENT_ID`
+- 前端會自動從 `/api/config` 取得，不需要額外設定
 
 ## 資料庫初始設定
 

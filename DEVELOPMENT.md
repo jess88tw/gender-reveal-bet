@@ -46,8 +46,8 @@ PORT=3333
 NODE_ENV=development
 FRONTEND_URL=http://localhost:4444
 GOOGLE_CLIENT_ID=your_google_client_id
-GOOGLE_CLIENT_SECRET=your_google_client_secret
 SESSION_SECRET=your_random_secret_key_here
+ADMIN_EMAILS=your-admin@example.com
 ```
 
 ```bash
@@ -73,14 +73,13 @@ cd frontend
 # 安裝依賴
 npm install
 
-# 編輯環境變數
-# 在 src/environments/environment.ts 設定 API URL 和 Google Client ID
-
 # 啟動開發伺服器
 npm start
 ```
 
 前端會在 `http://localhost:4444` 啟動
+
+> **注意**: 前端不需要額外設定！Google Client ID 和管理員 Email 等設定都統一在 `backend/.env` 管理，前端啟動時會自動從 `/api/config` 取得。
 
 ## Google OAuth 設定 (開發環境)
 
@@ -104,21 +103,11 @@ npm start
 
 ### 3. 更新設定檔
 
-**後端** (`backend/.env`):
+只需設定 **後端** (`backend/.env`)，前端會自動從 `/api/config` 取得：
 
 ```env
 GOOGLE_CLIENT_ID=your_client_id_here.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=your_client_secret_here
-```
-
-**前端** (`frontend/src/environments/environment.ts`):
-
-```typescript
-export const environment = {
-  production: false,
-  apiUrl: "http://localhost:3333/api",
-  googleClientId: "your_client_id_here.apps.googleusercontent.com",
-};
+ADMIN_EMAILS=your-admin@example.com
 ```
 
 ## 資料庫管理工具
@@ -240,8 +229,11 @@ git push origin feature/new-feature
 ```bash
 # 修改 schema.prisma
 
-# 建立 migration
-npx prisma migrate dev --name add_new_field
+# 同步到 MongoDB（MongoDB 使用 db push，不是 migrate）
+npx prisma db push
+
+# 重新產生 Prisma Client
+npx prisma generate
 
 # 測試變更
 npm run dev
