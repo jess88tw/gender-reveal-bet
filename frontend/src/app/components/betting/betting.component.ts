@@ -21,19 +21,20 @@ export class BettingComponent {
   currentUser = this.authService.currentUser;
 
   selectedGender = signal<'BOY' | 'GIRL' | null>(null);
-  ticketCount = signal(1);
   paymentMethod = signal('bank_transfer');
   submitting = signal(false);
   error = signal<string | null>(null);
   success = signal(false);
+  alreadyBet = signal(false);
 
-  // Computed
-  amount = computed(() => this.ticketCount() * 200);
+  // 固定金額
+  readonly amount = 200;
+
   canSubmit = computed(
     () =>
       this.selectedGender() !== null &&
-      this.ticketCount() >= 1 &&
-      !this.submitting(),
+      !this.submitting() &&
+      !this.alreadyBet(),
   );
 
   selectGender(gender: 'BOY' | 'GIRL'): void {
@@ -41,24 +42,19 @@ export class BettingComponent {
     this.error.set(null);
   }
 
-  incrementTickets(): void {
-    this.ticketCount.update((count) => count + 1);
-  }
-
-  decrementTickets(): void {
-    if (this.ticketCount() > 1) {
-      this.ticketCount.update((count) => count - 1);
-    }
-  }
-
-  setTicketCount(count: number): void {
-    if (count >= 1) {
-      this.ticketCount.set(count);
-    }
-  }
-
   setPaymentMethod(method: string): void {
     this.paymentMethod.set(method);
+  }
+
+  checkExistingBet(): void {
+    this.betService.getMyBets().subscribe({
+      next: (res) => {
+        if (res.bets.length > 0) {
+          this.alreadyBet.set(true);
+          this.error.set('您已經下注過了，每人限一注');
+        }
+      },
+    });
   }
 
   submitBet(): void {
@@ -72,11 +68,12 @@ export class BettingComponent {
     this.error.set(null);
 
     this.betService
-      .placeBet(this.selectedGender()!, this.amount(), this.paymentMethod())
+      .placeBet(this.selectedGender()!, this.paymentMethod())
       .subscribe({
         next: () => {
           this.success.set(true);
           this.submitting.set(false);
+          this.alreadyBet.set(true);
           // 更新統計
           this.betService.refreshAll();
         },
@@ -89,7 +86,6 @@ export class BettingComponent {
 
   resetForm(): void {
     this.selectedGender.set(null);
-    this.ticketCount.set(1);
     this.success.set(false);
     this.error.set(null);
   }

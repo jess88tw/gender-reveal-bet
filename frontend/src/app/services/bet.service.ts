@@ -53,12 +53,11 @@ export class BetService {
 
   placeBet(
     gender: 'BOY' | 'GIRL',
-    amount: number,
     paymentMethod?: string,
   ): Observable<{ message: string; bet: Bet }> {
     return this.http.post<{ message: string; bet: Bet }>(
       this.apiUrl,
-      { gender, amount, paymentMethod },
+      { gender, paymentMethod },
       { withCredentials: true },
     );
   }

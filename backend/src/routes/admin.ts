@@ -99,17 +99,12 @@ router.post('/draw-winner', requireAuth, requireAdmin, async (req: Request, res:
       return res.status(400).json({ error: 'No valid bets for drawing' });
     }
 
-    // 建立抽獎池（根據籤數）
-    const tickets: string[] = [];
-    correctBets.forEach(bet => {
-      for (let i = 0; i < bet.ticketCount; i++) {
-        tickets.push(bet.userId);
-      }
-    });
+    // 建立抽獎池（每人一注 = 一張籤）
+    const participantIds = correctBets.map(bet => bet.userId);
 
-    // 隨機抽出一張籤
-    const randomIndex = Math.floor(Math.random() * tickets.length);
-    const winnerId = tickets[randomIndex];
+    // 隨機抽出一位得主
+    const randomIndex = Math.floor(Math.random() * participantIds.length);
+    const winnerId = participantIds[randomIndex];
 
     // 更新得獎者
     await prisma.revealConfig.update({
@@ -128,18 +123,22 @@ router.post('/draw-winner', requireAuth, requireAdmin, async (req: Request, res:
       },
     });
 
-    // 計算獎金資訊
-    const wrongGender = config.revealedGender === 'BOY' ? 'GIRL' : 'BOY';
-    const wrongBetsTotal = await prisma.bet.aggregate({
-      where: { gender: wrongGender },
+    // 計算獎金資訊（全部已付款下注的總金額）
+    const allPaidBets = await prisma.bet.aggregate({
+      where: { isPaid: true },
       _sum: { amount: true },
     });
+    const totalPool = allPaidBets._sum.amount || 0;
+    const fee = Math.round(totalPool * 0.1); // 10% 手續費（奶粉錢）
+    const winnerPrize = totalPool - fee;
 
     res.json({
       message: 'Winner drawn successfully',
       winner,
-      prizePool: wrongBetsTotal._sum.amount || 0,
-      totalTickets: tickets.length,
+      totalPool,
+      fee,
+      winnerPrize,
+      totalParticipants: participantIds.length,
     });
   } catch (error) {
     console.error('Draw winner error:', error);

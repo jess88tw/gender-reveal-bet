@@ -54,15 +54,11 @@ router.get('/my-bets', requireAuth, async (req: Request, res: Response) => {
 // 建立新下注
 router.post('/', requireAuth, async (req: Request, res: Response) => {
   try {
-    const { gender, amount, paymentMethod } = req.body;
+    const { gender, paymentMethod } = req.body;
 
     // 驗證輸入
     if (!gender || !['BOY', 'GIRL'].includes(gender)) {
       return res.status(400).json({ error: 'Invalid gender' });
-    }
-
-    if (!amount || amount < 200 || amount % 200 !== 0) {
-      return res.status(400).json({ error: 'Amount must be a multiple of 200' });
     }
 
     // 檢查是否已經揭曉
@@ -71,13 +67,21 @@ router.post('/', requireAuth, async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Betting is closed - gender already revealed' });
     }
 
-    // 建立下注記錄
+    // 檢查是否已經下注過（每人限一注）
+    const existingBet = await prisma.bet.findFirst({
+      where: { userId: req.session.userId },
+    });
+    if (existingBet) {
+      return res.status(400).json({ error: '每人限下一注，您已經下注過了' });
+    }
+
+    // 建立下注記錄（固定 NT$200，1 張籤）
     const bet = await prisma.bet.create({
       data: {
         userId: req.session.userId!,
         gender,
-        amount,
-        ticketCount: amount / 200,
+        amount: 200,
+        ticketCount: 1,
         paymentMethod: paymentMethod || 'bank_transfer',
         isPaid: false, // 預設未付款，需要管理員確認
       },
@@ -123,8 +127,7 @@ router.get('/participants', async (req: Request, res: Response) => {
       id: p.id,
       name: p.name,
       avatarUrl: p.avatarUrl,
-      boyTickets: p.bets.filter(b => b.gender === 'BOY').reduce((sum, b) => sum + b.ticketCount, 0),
-      girlTickets: p.bets.filter(b => b.gender === 'GIRL').reduce((sum, b) => sum + b.ticketCount, 0),
+      gender: p.bets.length > 0 ? p.bets[0].gender : null,
     }));
 
     res.json({ participants: formattedParticipants });

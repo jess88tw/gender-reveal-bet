@@ -27,13 +27,13 @@ model User {
   @@map("users")
 }
 
-// 下注記錄
+// 下注記錄（每人限一注 NT$200）
 model Bet {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId        String   @db.ObjectId
+  userId        String   @unique @db.ObjectId  // 每人限一注
   gender        String   // 'BOY' or 'GIRL'
-  amount        Int      // 金額 (200的倍數)
-  ticketCount   Int      // 籤數 (amount / 200)
+  amount        Int      @default(200) // 固定 NT$200
+  ticketCount   Int      @default(1)   // 固定 1 張
   isPaid        Boolean  @default(false) // 是否已付款
   paymentMethod String?  // 付款方式
   createdAt     DateTime @default(now())
