@@ -1,0 +1,65 @@
+<div class="clues-container">
+  <header class="page-header">
+    <a routerLink="/" class="back-btn">← 返回</a>
+    <h1>🔍 線索大公開</h1>
+  </header>
+
+  <p class="intro">看看這些線索，猜猜寶寶是男生還是女生？</p>
+
+  @if (loading()) {
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>載入中...</p>
+    </div>
+  } @else if (clues().length === 0) {
+    <div class="empty-state">
+      <p>🔮 線索即將公開，敬請期待！</p>
+    </div>
+  } @else {
+    <div class="clues-grid">
+      @for (clue of clues(); track clue.id) {
+        <div class="clue-card" (click)="clue.imageUrl && openImage(clue.id)">
+          @if (clue.imageUrl) {
+            <div class="clue-image">
+              <img [src]="clue.imageUrl" [alt]="clue.title" />
+            </div>
+          } @else {
+            <div class="clue-placeholder">
+              <span>{{ getClueTypeLabel(clue.clueType).split(" ")[0] }}</span>
+            </div>
+          }
+          <div class="clue-content">
+            <span class="clue-type">{{ getClueTypeLabel(clue.clueType) }}</span>
+            <h3>{{ clue.title }}</h3>
+            @if (clue.description) {
+              <p>{{ clue.description }}</p>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Image Modal -->
+  @if (selectedClue()) {
+    <div class="modal-overlay" (click)="closeImage()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        @for (clue of clues(); track clue.id) {
+          @if (clue.id === selectedClue() && clue.imageUrl) {
+            <img [src]="clue.imageUrl" [alt]="clue.title" />
+            <h3>{{ clue.title }}</h3>
+            @if (clue.description) {
+              <p>{{ clue.description }}</p>
+            }
+          }
+        }
+        <button class="close-btn" (click)="closeImage()">✕</button>
+      </div>
+    </div>
+  }
+
+  <!-- Navigation -->
+  <div class="nav-section">
+    <a routerLink="/bet" class="btn btn-primary">看完線索，立即下注！</a>
+  </div>
+</div>

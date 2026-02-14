@@ -1,0 +1,181 @@
+<div class="betting-container">
+  <header class="page-header">
+    <a routerLink="/" class="back-btn">← 返回</a>
+    <h1>🎲 下注</h1>
+  </header>
+
+  @if (!isLoggedIn()) {
+    <div class="login-prompt">
+      <p>請先登入才能下注</p>
+      <a routerLink="/" class="btn btn-primary">返回首頁登入</a>
+    </div>
+  } @else if (success()) {
+    <!-- Success State -->
+    <div class="success-state">
+      <div class="success-icon">🎉</div>
+      <h2>下注成功！</h2>
+      <p>您已成功下注 {{ selectedGender() === "BOY" ? "男生" : "女生" }}</p>
+      <p class="bet-summary">
+        <span class="label">金額:</span>
+        <span class="value">NT$ {{ amount() | number }}</span>
+      </p>
+      <p class="bet-summary">
+        <span class="label">籤數:</span>
+        <span class="value">{{ ticketCount() }} 張</span>
+      </p>
+      <div class="payment-reminder">
+        <h4>💳 付款提醒</h4>
+        <p>請於下注後 3 日內完成付款</p>
+        <p>匯款帳號: XXX-XXXX-XXXX-XXXX</p>
+        <p>匯款後請通知主辦人確認</p>
+      </div>
+      <div class="success-actions">
+        <button (click)="resetForm()" class="btn btn-primary">繼續下注</button>
+        <button (click)="goToMyBets()" class="btn btn-secondary">
+          查看我的下注
+        </button>
+      </div>
+    </div>
+  } @else {
+    <!-- Betting Form -->
+    <div class="betting-form">
+      <!-- Step 1: Select Gender -->
+      <section class="form-section">
+        <h2>Step 1: 選擇性別</h2>
+        <div class="gender-selection">
+          <button
+            class="gender-btn boy-btn"
+            [class.selected]="selectedGender() === 'BOY'"
+            (click)="selectGender('BOY')"
+          >
+            <span class="icon">👦</span>
+            <span class="label">男生</span>
+          </button>
+          <button
+            class="gender-btn girl-btn"
+            [class.selected]="selectedGender() === 'GIRL'"
+            (click)="selectGender('GIRL')"
+          >
+            <span class="icon">👧</span>
+            <span class="label">女生</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Step 2: Select Ticket Count -->
+      <section class="form-section">
+        <h2>Step 2: 選擇籤數</h2>
+        <p class="hint">每張籤 NT$200</p>
+
+        <div class="ticket-selector">
+          <button
+            class="qty-btn"
+            (click)="decrementTickets()"
+            [disabled]="ticketCount() <= 1"
+          >
+            −
+          </button>
+          <input
+            type="number"
+            [value]="ticketCount()"
+            #ticketInput
+            (input)="setTicketCount(ticketInput.valueAsNumber)"
+            min="1"
+            class="qty-input"
+          />
+          <button class="qty-btn" (click)="incrementTickets()">+</button>
+        </div>
+
+        <div class="quick-select">
+          @for (count of [1, 3, 5, 10]; track count) {
+            <button
+              class="quick-btn"
+              [class.active]="ticketCount() === count"
+              (click)="setTicketCount(count)"
+            >
+              {{ count }} 張
+            </button>
+          }
+        </div>
+      </section>
+
+      <!-- Step 3: Payment Method -->
+      <section class="form-section">
+        <h2>Step 3: 付款方式</h2>
+        <div class="payment-options">
+          <label class="payment-option">
+            <input
+              type="radio"
+              name="payment"
+              value="bank_transfer"
+              [checked]="paymentMethod() === 'bank_transfer'"
+              (change)="setPaymentMethod('bank_transfer')"
+            />
+            <span class="option-label">🏦 銀行轉帳</span>
+          </label>
+          <label class="payment-option">
+            <input
+              type="radio"
+              name="payment"
+              value="line_pay"
+              [checked]="paymentMethod() === 'line_pay'"
+              (change)="setPaymentMethod('line_pay')"
+            />
+            <span class="option-label">💚 LINE Pay</span>
+          </label>
+          <label class="payment-option">
+            <input
+              type="radio"
+              name="payment"
+              value="cash"
+              [checked]="paymentMethod() === 'cash'"
+              (change)="setPaymentMethod('cash')"
+            />
+            <span class="option-label">💵 現金</span>
+          </label>
+        </div>
+      </section>
+
+      <!-- Summary -->
+      <section class="summary-section">
+        <h3>下注摘要</h3>
+        <div class="summary-row">
+          <span>性別</span>
+          <span>
+            @if (selectedGender()) {
+              {{ selectedGender() === "BOY" ? "👦 男生" : "👧 女生" }}
+            } @else {
+              尚未選擇
+            }
+          </span>
+        </div>
+        <div class="summary-row">
+          <span>籤數</span>
+          <span>{{ ticketCount() }} 張</span>
+        </div>
+        <div class="summary-row total">
+          <span>總金額</span>
+          <span>NT$ {{ amount() | number }}</span>
+        </div>
+      </section>
+
+      <!-- Error Message -->
+      @if (error()) {
+        <div class="error-message">⚠️ {{ error() }}</div>
+      }
+
+      <!-- Submit Button -->
+      <button
+        class="submit-btn"
+        [disabled]="!canSubmit()"
+        (click)="submitBet()"
+      >
+        @if (submitting()) {
+          <span class="spinner"></span> 處理中...
+        } @else {
+          確認下注 NT$ {{ amount() | number }}
+        }
+      </button>
+    </div>
+  }
+</div>

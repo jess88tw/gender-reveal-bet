@@ -1,0 +1,84 @@
+<div class="participants-container">
+  <header class="page-header">
+    <a routerLink="/" class="back-btn">← 返回</a>
+    <h1>👥 參與者</h1>
+  </header>
+
+  @if (loading()) {
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>載入中...</p>
+    </div>
+  } @else if (participants().length === 0) {
+    <div class="empty-state">
+      <p>🎯 還沒有人下注，快來成為第一個！</p>
+      <a routerLink="/bet" class="btn btn-primary">立即下注</a>
+    </div>
+  } @else {
+    <!-- Summary -->
+    <div class="summary">
+      <p>
+        共 <strong>{{ participants().length }}</strong> 人參與
+      </p>
+    </div>
+
+    <!-- Sort Options -->
+    <div class="sort-options">
+      <span>排序：</span>
+      <button
+        [class.active]="sortBy() === 'total'"
+        (click)="setSortBy('total')"
+      >
+        總籤數
+      </button>
+      <button [class.active]="sortBy() === 'boy'" (click)="setSortBy('boy')">
+        👦 男生
+      </button>
+      <button [class.active]="sortBy() === 'girl'" (click)="setSortBy('girl')">
+        👧 女生
+      </button>
+      <button [class.active]="sortBy() === 'name'" (click)="setSortBy('name')">
+        名字
+      </button>
+    </div>
+
+    <!-- Participants List -->
+    <div class="participants-list">
+      @for (
+        participant of sortedParticipants();
+        track participant.id;
+        let i = $index
+      ) {
+        <div class="participant-card">
+          <div class="rank">{{ i + 1 }}</div>
+          <div class="avatar">
+            @if (participant.avatarUrl) {
+              <img [src]="participant.avatarUrl" [alt]="participant.name" />
+            } @else {
+              <span class="initials">{{ getInitials(participant.name) }}</span>
+            }
+          </div>
+          <div class="info">
+            <p class="name">{{ participant.name }}</p>
+            <p class="total">{{ getTotalTickets(participant) }} 張籤</p>
+          </div>
+          <div class="bets">
+            @if (participant.boyTickets > 0) {
+              <span class="bet-badge boy">👦 {{ participant.boyTickets }}</span>
+            }
+            @if (participant.girlTickets > 0) {
+              <span class="bet-badge girl"
+                >👧 {{ participant.girlTickets }}</span
+              >
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Navigation -->
+  <div class="nav-section">
+    <a routerLink="/bet" class="btn btn-primary">加入下注</a>
+  </div>
+</div>

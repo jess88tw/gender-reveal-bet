@@ -1,0 +1,72 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// 使用者模型
+model User {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  email         String   @unique
+  name          String
+  avatarUrl     String?
+  provider      String   // 'google' or 'line'
+  providerId    String   
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  bets          Bet[]
+  
+  @@unique([provider, providerId])
+  @@map("users")
+}
+
+// 下注記錄
+model Bet {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String   @db.ObjectId
+  gender        String   // 'BOY' or 'GIRL'
+  amount        Int      // 金額 (200的倍數)
+  ticketCount   Int      // 籤數 (amount / 200)
+  isPaid        Boolean  @default(false) // 是否已付款
+  paymentMethod String?  // 付款方式
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("bets")
+}
+
+// 性別揭曉設定
+model RevealConfig {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  revealedGender  String?   // 'BOY' or 'GIRL'
+  isRevealed      Boolean   @default(false)
+  revealDate      DateTime? // 揭曉日期
+  winnerId        String?   // 得獎者 ID
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@map("reveal_config")
+}
+
+// 線索 (超音波、孕徵等)
+model Clue {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String?
+  imageUrl    String?
+  clueType    String   // 'ULTRASOUND', 'SYMPTOM', 'OTHER'
+  order       Int      @default(0) // 顯示順序
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("clues")
+}

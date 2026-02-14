@@ -1,0 +1,121 @@
+<div class="home-container">
+  <!-- Hero Section -->
+  <section class="hero">
+    <h1>🎀 寶寶性別揭曉派對 👶</h1>
+    <p class="subtitle">猜猜看是男生還是女生？</p>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="stats-section">
+    @if (loading()) {
+      <div class="loading">
+        <div class="spinner"></div>
+        <p>載入中...</p>
+      </div>
+    } @else {
+      <div class="stats-container">
+        <!-- Boy Box -->
+        <div class="bet-box boy-box">
+          <div class="box-icon">👦</div>
+          <h2>男生</h2>
+          @if (stats()) {
+            <div class="stats-info">
+              <p class="amount">NT$ {{ stats()!.boy.totalAmount | number }}</p>
+              <p class="tickets">{{ stats()!.boy.totalTickets }} 張籤</p>
+              <div class="percentage-bar">
+                <div
+                  class="fill boy-fill"
+                  [style.width.%]="boyPercentage()"
+                ></div>
+              </div>
+              <p class="percentage">{{ boyPercentage() }}%</p>
+            </div>
+          }
+        </div>
+
+        <!-- VS -->
+        <div class="vs-divider">
+          <span>VS</span>
+        </div>
+
+        <!-- Girl Box -->
+        <div class="bet-box girl-box">
+          <div class="box-icon">👧</div>
+          <h2>女生</h2>
+          @if (stats()) {
+            <div class="stats-info">
+              <p class="amount">NT$ {{ stats()!.girl.totalAmount | number }}</p>
+              <p class="tickets">{{ stats()!.girl.totalTickets }} 張籤</p>
+              <div class="percentage-bar">
+                <div
+                  class="fill girl-fill"
+                  [style.width.%]="girlPercentage()"
+                ></div>
+              </div>
+              <p class="percentage">{{ girlPercentage() }}%</p>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Total Prize Pool -->
+      <div class="prize-pool">
+        <h3>🎁 總獎金池</h3>
+        <p class="total-amount">NT$ {{ totalPrizePool() | number }}</p>
+        @if (stats()) {
+          <p class="total-participants">共 {{ stats()!.totalUsers }} 人參與</p>
+        }
+      </div>
+    }
+  </section>
+
+  <!-- Action Section -->
+  <section class="action-section">
+    @if (isLoggedIn()) {
+      <div class="user-info">
+        <p>歡迎, {{ currentUser()?.name }}!</p>
+        <div class="action-buttons">
+          <a routerLink="/bet" class="btn btn-primary">立即下注</a>
+          <a routerLink="/my-bets" class="btn btn-secondary">我的下注</a>
+          <button (click)="logout()" class="btn btn-outline">登出</button>
+        </div>
+      </div>
+    } @else {
+      <div class="login-section">
+        <p>登入後即可參與下注！</p>
+        <div class="login-buttons">
+          <button (click)="loginWithGoogle()" class="btn btn-google">
+            <span class="icon">G</span> 使用 Google 登入
+          </button>
+          <button (click)="loginWithLine()" class="btn btn-line">
+            <span class="icon">L</span> 使用 LINE 登入
+          </button>
+        </div>
+      </div>
+    }
+  </section>
+
+  <!-- Rules Section -->
+  <section class="rules-section">
+    <h3>📋 下注規則</h3>
+    <ul>
+      <li>💰 一張籤 NT$200</li>
+      <li>📦 可同時下注男生和女生箱子</li>
+      <li>♾️ 無下注上限</li>
+      <li>🎉 性別揭曉後，從正確箱子抽出一位幸運得主</li>
+      <li>🍼 猜錯箱子的金額全部變成奶粉錢</li>
+    </ul>
+  </section>
+
+  <!-- Navigation -->
+  <nav class="bottom-nav">
+    <a routerLink="/clues" class="nav-item">
+      <span class="nav-icon">🔍</span>
+      <span>線索</span>
+    </a>
+    <a routerLink="/participants" class="nav-item">
+      <span class="nav-icon">👥</span>
+      <span>參與者</span>
+    </a>
+  </nav>
+</div>
