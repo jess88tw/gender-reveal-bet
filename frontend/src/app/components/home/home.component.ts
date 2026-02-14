@@ -21,6 +21,7 @@ export class HomeComponent implements OnInit {
   // 直接使用 service 的 signals
   currentUser = this.authService.currentUser;
   isLoggedIn = this.authService.isLoggedIn;
+  isAdmin = this.authService.isAdmin;
   stats = this.betService.stats;
   boyPercentage = this.betService.boyPercentage;
   girlPercentage = this.betService.girlPercentage;

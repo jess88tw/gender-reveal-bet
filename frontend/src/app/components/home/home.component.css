@@ -234,6 +234,15 @@
   color: #333;
 }
 
+.btn-admin {
+  background: #343a40;
+  color: white;
+}
+
+.btn-admin:hover {
+  background: #23272b;
+}
+
 .login-section p {
   margin-bottom: 20px;
   color: #666;

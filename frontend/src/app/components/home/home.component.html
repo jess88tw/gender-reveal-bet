@@ -77,6 +77,9 @@
         <div class="action-buttons">
           <a routerLink="/bet" class="btn btn-primary">立即下注</a>
           <a routerLink="/my-bets" class="btn btn-secondary">我的下注</a>
+          @if (isAdmin()) {
+            <a routerLink="/admin" class="btn btn-admin">⚙️ 管理後台</a>
+          }
           <button (click)="logout()" class="btn btn-outline">登出</button>
         </div>
       </div>
@@ -87,8 +90,9 @@
           <button (click)="loginWithGoogle()" class="btn btn-google">
             <span class="icon">G</span> 使用 Google 登入
           </button>
-          <button (click)="loginWithLine()" class="btn btn-line">
-            <span class="icon">L</span> 使用 LINE 登入
+          <div id="google-signin-btn"></div>
+          <button (click)="loginWithLine()" class="btn btn-line" disabled title="即將推出">
+            <span class="icon">L</span> 使用 LINE 登入（即將推出）
           </button>
         </div>
       </div>
