@@ -9,6 +9,7 @@ import authRoutes from './routes/auth';
 import betsRoutes from './routes/bets';
 import cluesRoutes from './routes/clues';
 import adminRoutes from './routes/admin';
+import configRoutes from './routes/config';
 
 // 載入環境變數
 dotenv.config();
@@ -51,6 +52,7 @@ app.get('/health', (req, res) => {
 });
 
 // API 路由
+app.use('/api/config', configRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/bets', betsRoutes);
 app.use('/api/clues', cluesRoutes);
