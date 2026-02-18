@@ -10,6 +10,7 @@ import betsRoutes from './routes/bets';
 import cluesRoutes from './routes/clues';
 import adminRoutes from './routes/admin';
 import configRoutes from './routes/config';
+import symptomsRoutes from './routes/symptoms';
 
 // 載入環境變數
 dotenv.config();
@@ -57,6 +58,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/bets', betsRoutes);
 app.use('/api/clues', cluesRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/symptoms', symptomsRoutes);
 
 // 404 處理
 app.use((req, res) => {

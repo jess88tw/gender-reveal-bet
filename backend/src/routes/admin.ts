@@ -44,6 +44,31 @@ router.get('/reveal-status', async (req: Request, res: Response) => {
   }
 });
 
+// 更新爸媽預測（管理員）
+router.patch('/predictions', requireAuth, requireAdmin, async (req: Request, res: Response) => {
+  try {
+    const { dadPrediction, momPrediction } = req.body;
+
+    let config = await prisma.revealConfig.findFirst();
+    if (!config) {
+      config = await prisma.revealConfig.create({ data: {} });
+    }
+
+    config = await prisma.revealConfig.update({
+      where: { id: config.id },
+      data: {
+        ...(dadPrediction !== undefined && { dadPrediction }),
+        ...(momPrediction !== undefined && { momPrediction }),
+      },
+    });
+
+    res.json({ message: 'Predictions updated', config });
+  } catch (error) {
+    console.error('Update predictions error:', error);
+    res.status(500).json({ error: 'Failed to update predictions' });
+  }
+});
+
 // 揭曉性別（管理員）
 router.post('/reveal', requireAuth, requireAdmin, async (req: Request, res: Response) => {
   try {
@@ -212,6 +237,7 @@ router.post('/clear-data', requireAuth, requireAdmin, async (req: Request, res: 
   try {
     const bets = await prisma.bet.deleteMany();
     const config = await prisma.revealConfig.deleteMany();
+    const symptoms = await prisma.symptom.deleteMany();
     const users = await prisma.user.deleteMany();
 
     // 清空資料後銷毀 session，避免 userId 指向已刪除的使用者
@@ -224,6 +250,7 @@ router.post('/clear-data', requireAuth, requireAdmin, async (req: Request, res: 
         deleted: {
           bets: bets.count,
           revealConfig: config.count,
+          symptoms: symptoms.count,
           users: users.count,
         },
       });
