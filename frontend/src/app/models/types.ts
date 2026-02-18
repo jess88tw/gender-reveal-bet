@@ -45,6 +45,17 @@ export interface Clue {
   updatedAt: Date;
 }
 
+export interface Symptom {
+  id: string;
+  category: string;
+  boyDescription: string;
+  girlDescription: string;
+  checkedGender?: 'BOY' | 'GIRL' | null;
+  order: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface RevealConfig {
   id: string;
   revealedGender?: 'BOY' | 'GIRL';
@@ -52,6 +63,8 @@ export interface RevealConfig {
   revealDate?: Date;
   winnerId?: string;
   winner?: User;
+  dadPrediction?: 'BOY' | 'GIRL' | null;
+  momPrediction?: 'BOY' | 'GIRL' | null;
   createdAt: Date;
   updatedAt: Date;
 }

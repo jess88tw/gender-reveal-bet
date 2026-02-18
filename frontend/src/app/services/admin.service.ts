@@ -98,10 +98,18 @@ export class AdminService {
     );
   }
 
-  clearData(): Observable<{ message: string; deleted: { bets: number; revealConfig: number; users: number } }> {
-    return this.http.post<{ message: string; deleted: { bets: number; revealConfig: number; users: number } }>(
+  clearData(): Observable<{ message: string; deleted: { bets: number; revealConfig: number; symptoms: number; users: number } }> {
+    return this.http.post<{ message: string; deleted: { bets: number; revealConfig: number; symptoms: number; users: number } }>(
       `${this.apiUrl}/clear-data`,
       {},
+      { withCredentials: true },
+    );
+  }
+
+  updatePredictions(dadPrediction: string | null, momPrediction: string | null): Observable<{ message: string; config: any }> {
+    return this.http.patch<{ message: string; config: any }>(
+      `${this.apiUrl}/predictions`,
+      { dadPrediction, momPrediction },
       { withCredentials: true },
     );
   }
