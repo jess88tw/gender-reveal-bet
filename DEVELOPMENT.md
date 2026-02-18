@@ -99,6 +99,7 @@ npm start
      - `http://localhost:4444`
    - **Authorized redirect URIs**:
      - `http://localhost:4444`
+     - `http://localhost:3333/api/auth/google-redirect`（手機 redirect 登入用）
 5. 儲存並複製 Client ID 和 Client Secret
 
 ### 3. 更新設定檔

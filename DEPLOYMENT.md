@@ -38,8 +38,8 @@
 2. 編輯你的 OAuth 2.0 Client ID
 3. 在「授權的 JavaScript 來源」加入：
    - `https://your-app.onrender.com`（Render 給你的網址）
-4. 在「授權的重新導向 URI」加入：
-   - `https://your-app.onrender.com`
+4. 在「授權的重新導向 URI」加入（手機 redirect 登入用）：
+   - `https://your-app.onrender.com/api/auth/google-redirect`
 
 ### 3. GitHub Repository
 
@@ -60,33 +60,34 @@ git push -u origin main
 3. 連結你的 GitHub repo（`gender-reveal-bet`）
 4. 填入以下設定：
 
-| 欄位 | 值 |
-|------|-----|
-| **Name** | `gender-reveal-bet`（或任何名稱） |
-| **Region** | Singapore（離台灣最近） |
-| **Branch** | `main` |
-| **Runtime** | `Node` |
-| **Build Command** | `npm run render:build` |
-| **Start Command** | `npm start` |
-| **Plan** | Free |
+| 欄位              | 值                                |
+| ----------------- | --------------------------------- |
+| **Name**          | `gender-reveal-bet`（或任何名稱） |
+| **Region**        | Singapore（離台灣最近）           |
+| **Branch**        | `main`                            |
+| **Runtime**       | `Node`                            |
+| **Build Command** | `npm run render:build`            |
+| **Start Command** | `npm start`                       |
+| **Plan**          | Free                              |
 
 ### 2. 設定環境變數
 
 在 Render Dashboard → Environment 加入：
 
-| 變數 | 值 | 說明 |
-|------|-----|------|
-| `NODE_ENV` | `production` | 啟用正式模式 |
-| `DATABASE_URL` | `mongodb+srv://...` | MongoDB Atlas 連線字串 |
-| `GOOGLE_CLIENT_ID` | `xxx.apps.googleusercontent.com` | Google OAuth ID |
-| `ADMIN_EMAILS` | `your@email.com` | 管理員 Email |
-| `SESSION_SECRET` | （自動產生或自訂強密碼） | Session 加密 |
+| 變數               | 值                               | 說明                   |
+| ------------------ | -------------------------------- | ---------------------- |
+| `NODE_ENV`         | `production`                     | 啟用正式模式           |
+| `DATABASE_URL`     | `mongodb+srv://...`              | MongoDB Atlas 連線字串 |
+| `GOOGLE_CLIENT_ID` | `xxx.apps.googleusercontent.com` | Google OAuth ID        |
+| `ADMIN_EMAILS`     | `your@email.com`                 | 管理員 Email           |
+| `SESSION_SECRET`   | （自動產生或自訂強密碼）         | Session 加密           |
 
 > **不需要設定** `PORT`（Render 自動分配）和 `FRONTEND_URL`（合併部署不需要）。
 
 ### 3. 點擊 Deploy
 
 Render 會自動執行：
+
 1. `npm run render:build` — 安裝前後端依賴 → 編譯 Angular → 編譯 TypeScript
 2. `npm start` — 啟動 Express，同時 serve API 和前端靜態檔
 
@@ -132,18 +133,19 @@ npm run render:build
 ```
 
 Express 在正式環境會：
+
 - 先處理 `/api/*` 路由
 - 再 serve `frontend/dist/frontend/browser/` 靜態檔
 - 所有其他路由 fallback 到 `index.html`（SPA routing）
 
 ## 免費方案注意事項
 
-| 項目 | 說明 |
-|------|------|
+| 項目    | 說明                                       |
+| ------- | ------------------------------------------ |
 | ⏱️ 休眠 | 15 分鐘無流量會休眠，下次訪問等 ~30 秒喚醒 |
-| 📊 額度 | 750 小時/月（足夠 1 個服務全月運行） |
-| 🌐 流量 | 100 GB/月 |
-| 💾 空間 | 免費方案足夠 |
+| 📊 額度 | 750 小時/月（足夠 1 個服務全月運行）       |
+| 🌐 流量 | 100 GB/月                                  |
+| 💾 空間 | 免費方案足夠                               |
 
 > **活動當天提示**：提前 5 分鐘訪問網站確保已喚醒，之後不會再休眠。
 
@@ -158,18 +160,24 @@ Express 在正式環境會：
 ## 常見問題
 
 ### Google 登入失敗
+
 - 確認 Google Cloud Console 的「授權的 JavaScript 來源」有加入 Render 網址
+- 確認「授權的重新導向 URI」有加入 `https://your-app.onrender.com/api/auth/google-redirect`（手機登入用）
 - 確認 `GOOGLE_CLIENT_ID` 環境變數正確
+- LINE / Facebook 內建瀏覽器無法使用 Google 登入（Google 政策限制），前端已加入引導訊息
 
 ### Session / 登入狀態無法保持
+
 - 確認 `NODE_ENV=production`（啟用 secure cookie + trust proxy）
 - 確認 `SESSION_SECRET` 已設定
 
 ### 資料庫連線失敗
+
 - 確認 MongoDB Atlas Network Access 有 `0.0.0.0/0`
 - 確認 `DATABASE_URL` 格式正確（包含帳號密碼和資料庫名稱）
 
 ### 頁面空白（前端沒載入）
+
 - 檢查 Render logs，確認 build 過程有成功編譯 Angular
 - 確認 `npm run render:build` 有正確執行
 

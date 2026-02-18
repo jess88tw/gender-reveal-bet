@@ -77,10 +77,11 @@ npm start
 | `SESSION_SECRET`   | Session 加密密鑰               |
 | `FRONTEND_URL`     | 前端網址（CORS 用）            |
 
-## 部署建議
+## 部署
 
-- **後端**: Railway / Render
-- **前端**: Vercel / Netlify
+本專案使用 **Render 合併部署**（前後端同一服務），詳見 [部署指南](DEPLOYMENT.md)。
+
+- **運行環境**: Render Web Service
 - **資料庫**: MongoDB Atlas (雲端)
 
 ## 參與者

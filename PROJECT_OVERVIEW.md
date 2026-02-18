@@ -13,7 +13,7 @@ gender-reveal-bet/
 │   │   └── schema.prisma   # 資料庫 Schema (MongoDB)
 │   ├── src/
 │   │   ├── routes/         # API 路由
-│   │   │   ├── auth.ts     # 認證相關 (Google Identity Services)
+│   │   │   ├── auth.ts     # 認證相關 (Google 登入 + 手機 redirect 登入)
 │   │   │   ├── bets.ts     # 下注相關
 │   │   │   ├── clues.ts    # 線索相關
 │   │   │   ├── symptoms.ts # 孕徵對照 CRUD
@@ -70,7 +70,11 @@ backend/.env  ──→  GET /api/config  ──→  前端 ConfigService (APP_I
 
 ### 後端 API
 
-- ✅ 使用者認證 (Google Identity Services — ID Token 驗證)
+- ✅ 使用者認證
+  - Google Identity Services — ID Token 驗證
+  - 桌面端：popup 模式（One Tap + fallback 按鈕）
+  - 手機端：redirect 模式（`POST /api/auth/google-redirect`，避免 GIS 在手機上卡住）
+  - WebView 偵測（LINE / Facebook 內建瀏覽器不支援 Google OAuth，顯示引導訊息）
 - ✅ 統一設定 API (`GET /api/config` — 回傳 googleClientId + adminEmails)
 - ✅ 下注系統
   - 每人限下一注（NT$200，男生或女生擇一）
@@ -104,7 +108,7 @@ backend/.env  ──→  GET /api/config  ──→  前端 ConfigService (APP_I
 ### 前端服務
 
 - ✅ 設定服務 (`config.service.ts`) - 啟動時從後端載入設定，使用 `APP_INITIALIZER`
-- ✅ 認證服務 (`auth.service.ts`) - Google GIS 登入，使用 signals + 取消登入不破版 + `clearUser()` 方法
+- ✅ 認證服務 (`auth.service.ts`) - Google GIS 登入（桌面 popup / 手機 redirect）+ WebView 偵測 + signals + `clearUser()` 方法
 - ✅ 下注服務 (`bet.service.ts`) - 使用 signals + 揭曉狀態查詢 + 得獎者/獎金資訊
 - ✅ 線索服務 (`clue.service.ts`) - 使用 signals + 孕徵 CRUD（getSymptoms、initSymptoms、toggleSymptom、createSymptom、deleteSymptom）
 - ✅ 管理服務 (`admin.service.ts`) - 使用 signals + 得獎者/獎金持久化 signals + 爸媽預測更新
@@ -122,11 +126,10 @@ backend/.env  ──→  GET /api/config  ──→  前端 ConfigService (APP_I
 
 ### 短期
 
-1. **LINE Login 整合**: 目前按鈕已保留但尚未實作
+1. **LINE Login 整合**: 目前按鈕已隱藏，待實作
 2. **檔案上傳功能**: 線索圖片上傳（可用 Cloudinary / AWS S3）
 3. **即時通知**: 使用 WebSocket 或 Server-Sent Events
 4. **付款整合**: 串接台灣金流（綠界、藍新）
-5. **Google GIS 遷移至 FedCM**: Google One Tap 未來將強制使用 FedCM API，需按照 [遷移指南](https://developers.google.com/identity/gsi/web/guides/fedcm-migration) 更新登入流程
 
 ### 長期
 
@@ -178,15 +181,11 @@ ng build --configuration production  # 建置正式版本
 ng generate component components/<name>  # 建立新元件
 ```
 
-### 部署
+### 部署（Render 合併部署）
 
 ```bash
-# 後端 (Railway)
-railway login
-railway link
-railway up
-
-# 前端 (Vercel)
-vercel
-vercel --prod
+# 推送到 GitHub 自動觸發 Render 重新部署
+git add .
+git commit -m "update"
+git push
 ```
