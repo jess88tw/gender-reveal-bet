@@ -81,7 +81,7 @@ router.post('/logout', (req: Request, res: Response) => {
 router.get('/me', async (req: Request, res: Response) => {
   try {
     if (!req.session.userId) {
-      return res.status(401).json({ error: 'Not authenticated' });
+      return res.json({ user: null });
     }
 
     const user = await prisma.user.findUnique({

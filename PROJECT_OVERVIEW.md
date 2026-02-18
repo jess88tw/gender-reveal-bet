@@ -126,6 +126,7 @@ backend/.env  ──→  GET /api/config  ──→  前端 ConfigService (APP_I
 2. **檔案上傳功能**: 線索圖片上傳（可用 Cloudinary / AWS S3）
 3. **即時通知**: 使用 WebSocket 或 Server-Sent Events
 4. **付款整合**: 串接台灣金流（綠界、藍新）
+5. **Google GIS 遷移至 FedCM**: Google One Tap 未來將強制使用 FedCM API，需按照 [遷移指南](https://developers.google.com/identity/gsi/web/guides/fedcm-migration) 更新登入流程
 
 ### 長期
 
