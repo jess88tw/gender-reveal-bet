@@ -51,6 +51,8 @@ model RevealConfig {
   isRevealed      Boolean   @default(false)
   revealDate      DateTime? // 揭曉日期
   winnerId        String?   // 得獎者 ID
+  dadPrediction   String?   // 爸爸預測 'BOY' or 'GIRL'
+  momPrediction   String?   // 媽媽預測 'BOY' or 'GIRL'
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   
@@ -69,4 +71,18 @@ model Clue {
   updatedAt   DateTime @updatedAt
   
   @@map("clues")
+}
+
+// 孕徵症狀對照（Boy vs Girl）
+model Symptom {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  category        String   // 分類名稱，如 "肚型"、"皮膚"
+  boyDescription  String   // 男生特徵描述，如 "尖尖"
+  girlDescription String   // 女生特徵描述，如 "圓圓"
+  checkedGender   String?  // 'BOY' or 'GIRL'，管理員勾選的實際情況
+  order           Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("symptoms")
 }
