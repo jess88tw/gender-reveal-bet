@@ -88,8 +88,7 @@
             @if (bet.paymentMethod === 'bank_transfer') {
               <div class="payment-info">
                 <p class="payment-info-label">🏦 銀行轉帳資訊</p>
-                <!-- TODO: 把敏感資料都放到一個 config 或環境變數中 -->
-                <p>匯款帳號: XXX-XXXX-XXXX-XXXX</p>
+                <p>📩 請私訊主辦人取得匯款帳號</p>
                 <p>匯款後請通知主辦人確認</p>
               </div>
             } @else if (bet.paymentMethod === 'line_pay') {
@@ -105,8 +104,8 @@
               </div>
             } @else {
               <div class="payment-info">
-                <p>匯款帳號: XXX-XXXX-XXXX-XXXX</p>
-                <p>匯款後請通知主辦人確認</p>
+                <p>📩 請私訊主辦人取得付款資訊</p>
+                <p>付款後請通知主辦人確認</p>
               </div>
             }
           </div>
