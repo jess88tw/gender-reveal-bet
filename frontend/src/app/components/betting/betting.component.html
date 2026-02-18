@@ -14,21 +14,70 @@
     <div class="success-state">
       <div class="success-icon">🎉</div>
       <h2>下注成功！</h2>
-      <p>您已成功下注 {{ selectedGender() === "BOY" ? "男生" : "女生" }}</p>
-      <p class="bet-summary">
-        <span class="label">金額:</span>
-        <span class="value">NT$ 200</span>
+      <p class="success-gender">
+        您已成功下注
+        <span class="gender-tag" [class.boy]="selectedGender() === 'BOY'" [class.girl]="selectedGender() === 'GIRL'">
+          {{ selectedGender() === "BOY" ? "👦 男生" : "👧 女生" }}
+        </span>
       </p>
-      <div class="payment-reminder">
-        <h4>💳 付款提醒</h4>
-        <p>請於下注後 3 日內完成付款</p>
-        <p>匯款帳號: XXX-XXXX-XXXX-XXXX</p>
-        <p>匯款後請通知主辦人確認</p>
+
+      <div class="success-details">
+        <div class="detail-row">
+          <span class="detail-label">下注金額</span>
+          <span class="detail-value highlight">NT$ 200</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">付款方式</span>
+          <span class="detail-value">
+            @if (paymentMethod() === 'bank_transfer') {
+              🏦 銀行轉帳
+            } @else if (paymentMethod() === 'line_pay') {
+              💚 LINE Pay
+            } @else {
+              💵 現金
+            }
+          </span>
+        </div>
       </div>
+
+      <!-- 依付款方式顯示不同提醒 -->
+      @if (paymentMethod() === 'bank_transfer') {
+        <div class="payment-reminder bank">
+          <h4>🏦 銀行轉帳資訊</h4>
+          <p>請於下注後 <strong>3 日內</strong>完成匯款</p>
+          <div class="payment-info-box">
+            <p class="info-row">
+              <span class="info-label">匯款帳號</span>
+              <span class="info-value">XXX-XXXX-XXXX-XXXX</span>
+            </p>
+          </div>
+          <p class="reminder-note">匯款後請通知主辦人確認 ✅</p>
+        </div>
+      } @else if (paymentMethod() === 'line_pay') {
+        <div class="payment-reminder line">
+          <h4>💚 LINE Pay 付款</h4>
+          <p>請於下注後 <strong>3 日內</strong>完成轉帳</p>
+          <div class="payment-info-box">
+            <p>請透過 LINE Pay 轉帳給主辦人</p>
+          </div>
+          <p class="reminder-note">轉帳後請截圖通知主辦人確認 📸</p>
+        </div>
+      } @else {
+        <div class="payment-reminder cash">
+          <h4>💵 現金付款</h4>
+          <p>請於活動當天或約定時間完成付款</p>
+          <div class="payment-info-box">
+            <p>請當面交給主辦人即可</p>
+          </div>
+          <p class="reminder-note">交付後主辦人會確認您的付款狀態 🤝</p>
+        </div>
+      }
+
       <div class="success-actions">
         <button (click)="goToMyBets()" class="btn btn-primary">
-          查看我的下注
+          📋 查看我的下注
         </button>
+        <a routerLink="/" class="btn btn-secondary">🏠 回首頁</a>
       </div>
     </div>
   } @else {

@@ -300,54 +300,163 @@
 
 .success-icon {
   font-size: 4rem;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 .success-state h2 {
   color: #00b894;
   margin-bottom: 10px;
+  font-size: 1.6rem;
 }
 
-.bet-summary {
+.success-gender {
   font-size: 1.1rem;
-  margin: 10px 0;
+  color: #555;
+  margin-bottom: 20px;
 }
 
-.bet-summary .label {
-  color: #666;
-}
-
-.bet-summary .value {
+.gender-tag {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 20px;
   font-weight: 600;
-  margin-left: 10px;
+  font-size: 1rem;
 }
 
-.payment-reminder {
-  background: #fff9e6;
-  padding: 20px;
-  border-radius: 10px;
-  margin: 25px 0;
+.gender-tag.boy {
+  background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+  color: white;
+}
+
+.gender-tag.girl {
+  background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);
+  color: white;
+}
+
+/* Success Details */
+.success-details {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 18px 22px;
+  margin-bottom: 20px;
   text-align: left;
+}
+
+.success-details .detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.success-details .detail-row:last-child {
+  border-bottom: none;
+}
+
+.success-details .detail-label {
+  color: #888;
+  font-size: 0.95rem;
+}
+
+.success-details .detail-value {
+  font-weight: 600;
+  color: #333;
+}
+
+.success-details .detail-value.highlight {
+  color: #e17055;
+  font-size: 1.05rem;
+}
+
+/* Payment Reminder (per method) */
+.payment-reminder {
+  border-radius: 15px;
+  padding: 22px;
+  margin-bottom: 25px;
+  text-align: left;
+}
+
+.payment-reminder.bank {
+  background: #eef6ff;
+  border-left: 4px solid #0984e3;
+}
+
+.payment-reminder.line {
+  background: #eafff0;
+  border-left: 4px solid #00b900;
+}
+
+.payment-reminder.cash {
+  background: #fff9e6;
+  border-left: 4px solid #f1c40f;
 }
 
 .payment-reminder h4 {
   margin-bottom: 10px;
+  font-size: 1.1rem;
+  color: #333;
 }
 
-.payment-reminder p {
+.payment-reminder > p {
   margin: 8px 0;
-  color: #666;
+  color: #555;
   font-size: 0.95rem;
 }
 
+.payment-reminder > p strong {
+  color: #e17055;
+}
+
+.payment-info-box {
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 10px;
+  padding: 15px;
+  margin: 12px 0;
+}
+
+.payment-info-box p {
+  margin: 6px 0;
+  color: #555;
+  font-size: 0.93rem;
+}
+
+.payment-info-box .info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.payment-info-box .info-label {
+  color: #888;
+  font-size: 0.9rem;
+}
+
+.payment-info-box .info-value {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+}
+
+.reminder-note {
+  font-size: 0.9rem;
+  color: #888;
+  margin-top: 10px;
+}
+
+/* Success Actions */
 .success-actions {
   display: flex;
-  gap: 15px;
+  gap: 12px;
   justify-content: center;
   flex-wrap: wrap;
 }
 
 .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   padding: 12px 24px;
   border-radius: 25px;
   font-size: 1rem;
@@ -363,9 +472,18 @@
   color: white;
 }
 
+.btn-primary:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
 .btn-secondary {
   background: #f8f9fa;
   color: #333;
+}
+
+.btn-secondary:hover {
+  background: #e9ecef;
 }
 
 /* Responsive */
@@ -378,7 +496,14 @@
     flex-direction: column;
   }
 
-  .btn {
+  .success-actions .btn {
     width: 100%;
+    justify-content: center;
+  }
+
+  .payment-info-box .info-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
   }
 }
