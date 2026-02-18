@@ -14,7 +14,7 @@ import { interval } from 'rxjs';
   styleUrl: './home.component.css',
 })
 export class HomeComponent implements OnInit {
-  private authService = inject(AuthService);
+  authService = inject(AuthService);
   private betService = inject(BetService);
   private destroyRef = inject(DestroyRef);
 

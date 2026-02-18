@@ -19,6 +19,10 @@ export class AuthService {
   private currentUserSignal = signal<User | null>(null);
   private loginErrorSignal = signal<string | null>(null);
 
+  // 是否顯示 Google 原生按鈕（One Tap 無法顯示時的 fallback）
+  private showGoogleRenderedBtnSignal = signal(false);
+  readonly showGoogleRenderedBtn = this.showGoogleRenderedBtnSignal.asReadonly();
+
   // 公開的 computed signals
   readonly currentUser = this.currentUserSignal.asReadonly();
   readonly isLoggedIn = computed(() => this.currentUserSignal() !== null);
@@ -62,8 +66,9 @@ export class AuthService {
 
     // 顯示 Google 登入彈出視窗
     google.accounts.id.prompt((notification: any) => {
-      if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-        // 如果 One Tap 不顯示，改用按鈕式登入
+      if (notification.isNotDisplayed()) {
+        // One Tap 完全無法顯示（瀏覽器不支援等），才改用按鈕式登入
+        this.ngZone.run(() => this.showGoogleRenderedBtnSignal.set(true));
         google.accounts.id.renderButton(
           document.getElementById('google-signin-btn'),
           {
@@ -74,6 +79,7 @@ export class AuthService {
           },
         );
       }
+      // isSkippedMoment / isDismissedMoment 不處理，用戶只是取消，下次再點即可
     });
   }
 

@@ -255,6 +255,10 @@
   flex-wrap: wrap;
 }
 
+#google-signin-btn.hidden {
+  display: none;
+}
+
 .btn-google {
   background: white;
   color: #333;
