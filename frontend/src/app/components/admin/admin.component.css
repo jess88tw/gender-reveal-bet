@@ -453,6 +453,244 @@
   cursor: not-allowed;
 }
 
+/* Symptom Management */
+.symptom-section {
+  margin-bottom: 32px;
+}
+
+.symptom-section h2 {
+  margin-bottom: 4px;
+}
+
+.section-desc {
+  color: #888;
+  font-size: 0.85rem;
+  margin-bottom: 16px;
+}
+
+.empty-symptoms {
+  text-align: center;
+  padding: 32px;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.empty-symptoms p {
+  color: #888;
+  margin-bottom: 16px;
+}
+
+.btn-init {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-init:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.symptom-table {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 20px;
+}
+
+.symptom-header {
+  display: grid;
+  grid-template-columns: 90px 1fr 1fr 40px;
+  gap: 4px;
+  padding: 10px 12px;
+  background: #f0f0f0;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.symptom-row {
+  display: grid;
+  grid-template-columns: 90px 1fr 1fr 40px;
+  gap: 4px;
+  padding: 6px 12px;
+  align-items: center;
+  border-bottom: 1px solid #f0f0f0;
+  background: white;
+}
+
+.symptom-row:last-child {
+  border-bottom: none;
+}
+
+.col-category {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.toggle-btn {
+  padding: 8px 10px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fafafa;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.toggle-btn:hover {
+  border-color: #bbb;
+}
+
+.col-boy.toggle-btn.checked {
+  background: #e3f2fd;
+  border-color: #42a5f5;
+  color: #1565c0;
+  font-weight: 600;
+}
+
+.col-girl.toggle-btn.checked {
+  background: #fce4ec;
+  border-color: #f06292;
+  color: #c62828;
+  font-weight: 600;
+}
+
+.delete-symptom-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  opacity: 0.4;
+  transition: opacity 0.2s;
+  padding: 4px;
+}
+
+.delete-symptom-btn:hover {
+  opacity: 1;
+}
+
+/* Predictions */
+.predictions-section {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.predictions-section h3 {
+  margin-bottom: 16px;
+  font-size: 1rem;
+}
+
+.prediction-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.prediction-row label {
+  font-weight: 600;
+  min-width: 80px;
+  font-size: 0.9rem;
+}
+
+.prediction-btns {
+  display: flex;
+  gap: 8px;
+}
+
+.pred-btn {
+  padding: 6px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 20px;
+  background: white;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.pred-btn.boy.active {
+  background: #e3f2fd;
+  border-color: #42a5f5;
+  color: #1565c0;
+  font-weight: 600;
+}
+
+.pred-btn.girl.active {
+  background: #fce4ec;
+  border-color: #f06292;
+  color: #c62828;
+  font-weight: 600;
+}
+
+.btn-save-pred {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+.btn-save-pred:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Add Symptom */
+.add-symptom-area {
+  margin-top: 12px;
+}
+
+.btn-add-symptom {
+  background: white;
+  border: 2px dashed #ccc;
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  color: #666;
+  transition: all 0.2s;
+}
+
+.btn-add-symptom:hover {
+  border-color: #999;
+  color: #333;
+}
+
+.add-symptom-form {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.add-symptom-form input {
+  flex: 1;
+  min-width: 120px;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.add-symptom-form input:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
   .stats-grid {

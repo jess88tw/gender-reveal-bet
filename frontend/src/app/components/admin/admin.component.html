@@ -164,6 +164,136 @@
       }
     </section>
 
+    <!-- Symptom Management -->
+    <section class="symptom-section">
+      <h2>🤰 孕徵管理</h2>
+      <p class="section-desc">設定孕徵線索，勾選媽媽的實際情況讓大家參考</p>
+
+      @if (symptoms().length === 0) {
+        <div class="empty-symptoms">
+          <p>尚未建立孕徵資料</p>
+          <button
+            class="btn btn-init"
+            (click)="initSymptoms()"
+            [disabled]="actionLoading()"
+          >
+            📋 載入預設孕徵
+          </button>
+        </div>
+      } @else {
+        <div class="symptom-table">
+          <div class="symptom-header">
+            <span class="col-category">項目</span>
+            <span class="col-boy">👦 男生特徵</span>
+            <span class="col-girl">👧 女生特徵</span>
+            <span class="col-action"></span>
+          </div>
+          @for (symptom of symptoms(); track symptom.id) {
+            <div class="symptom-row">
+              <span class="col-category">{{ symptom.category }}</span>
+              <button
+                class="col-boy toggle-btn"
+                [class.checked]="symptom.checkedGender === 'BOY'"
+                (click)="toggleSymptom(symptom, 'BOY')"
+              >
+                @if (symptom.checkedGender === 'BOY') { ✅ }
+                {{ symptom.boyDescription }}
+              </button>
+              <button
+                class="col-girl toggle-btn"
+                [class.checked]="symptom.checkedGender === 'GIRL'"
+                (click)="toggleSymptom(symptom, 'GIRL')"
+              >
+                @if (symptom.checkedGender === 'GIRL') { ✅ }
+                {{ symptom.girlDescription }}
+              </button>
+              <button class="col-action delete-symptom-btn" (click)="deleteSymptom(symptom)" title="刪除">
+                🗑️
+              </button>
+            </div>
+          }
+        </div>
+
+        <!-- 爸媽預測 -->
+        <div class="predictions-section">
+          <h3>👨‍👩‍👧 爸媽預測</h3>
+          <div class="prediction-row">
+            <label>爸爸預測：</label>
+            <div class="prediction-btns">
+              <button
+                class="pred-btn boy"
+                [class.active]="dadPrediction() === 'BOY'"
+                (click)="dadPrediction.set(dadPrediction() === 'BOY' ? null : 'BOY')"
+              >👦 男</button>
+              <button
+                class="pred-btn girl"
+                [class.active]="dadPrediction() === 'GIRL'"
+                (click)="dadPrediction.set(dadPrediction() === 'GIRL' ? null : 'GIRL')"
+              >👧 女</button>
+            </div>
+          </div>
+          <div class="prediction-row">
+            <label>媽媽預測：</label>
+            <div class="prediction-btns">
+              <button
+                class="pred-btn boy"
+                [class.active]="momPrediction() === 'BOY'"
+                (click)="momPrediction.set(momPrediction() === 'BOY' ? null : 'BOY')"
+              >👦 男</button>
+              <button
+                class="pred-btn girl"
+                [class.active]="momPrediction() === 'GIRL'"
+                (click)="momPrediction.set(momPrediction() === 'GIRL' ? null : 'GIRL')"
+              >👧 女</button>
+            </div>
+          </div>
+          <button
+            class="btn btn-save-pred"
+            (click)="savePredictions()"
+            [disabled]="actionLoading()"
+          >
+            💾 儲存預測
+          </button>
+        </div>
+      }
+
+      <!-- Add Symptom -->
+      <div class="add-symptom-area">
+        <button class="btn btn-add-symptom" (click)="toggleAddSymptom()">
+          {{ showAddSymptom() ? '取消' : '＋ 新增孕徵' }}
+        </button>
+        @if (showAddSymptom()) {
+          <div class="add-symptom-form">
+            <input
+              type="text"
+              placeholder="項目名稱（如：肚型）"
+              [ngModel]="newCategory()"
+              (ngModelChange)="newCategory.set($event)"
+            />
+            <input
+              type="text"
+              placeholder="男生特徵（如：尖尖）"
+              [ngModel]="newBoyDesc()"
+              (ngModelChange)="newBoyDesc.set($event)"
+            />
+            <input
+              type="text"
+              placeholder="女生特徵（如：圓圓）"
+              [ngModel]="newGirlDesc()"
+              (ngModelChange)="newGirlDesc.set($event)"
+            />
+            <button
+              class="btn btn-confirm"
+              (click)="addSymptom()"
+              [disabled]="!newCategory() || !newBoyDesc() || !newGirlDesc() || actionLoading()"
+            >
+              新增
+            </button>
+          </div>
+        }
+      </div>
+    </section>
+
     <!-- Dev Tools -->
     <section class="dev-section">
       <h2>🛠️ 開發工具</h2>
