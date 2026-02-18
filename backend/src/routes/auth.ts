@@ -67,6 +67,69 @@ router.post('/google', async (req: Request, res: Response) => {
   }
 });
 
+// Google 登入 — redirect 模式（手機用）
+// GIS 在手機上 popup/iframe 常卡在 /gsi/transform，改用 ux_mode:'redirect'
+// Google 會將 credential 以 form POST 傳送到此端點
+router.post('/google-redirect', async (req: Request, res: Response) => {
+  try {
+    const { credential } = req.body;
+
+    if (!credential) {
+      return res.redirect('/?login_error=missing_credential');
+    }
+
+    // 驗證 Google token（與 /google 端點相同邏輯）
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+
+    if (!payload || !payload.email || !payload.sub) {
+      return res.redirect('/?login_error=invalid_token');
+    }
+
+    // 查找或建立使用者
+    let user = await prisma.user.findUnique({
+      where: {
+        provider_providerId: {
+          provider: 'google',
+          providerId: payload.sub,
+        },
+      },
+    });
+
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          email: payload.email,
+          name: payload.name || payload.email,
+          avatarUrl: payload.picture,
+          provider: 'google',
+          providerId: payload.sub,
+        },
+      });
+    }
+
+    // 設定 session
+    req.session.userId = user.id;
+    req.session.userEmail = user.email;
+
+    // 確保 session 儲存後再 redirect
+    req.session.save((err) => {
+      if (err) {
+        console.error('Session save error:', err);
+        return res.redirect('/?login_error=session_error');
+      }
+      res.redirect('/');
+    });
+  } catch (error) {
+    console.error('Google redirect auth error:', error);
+    res.redirect('/?login_error=auth_failed');
+  }
+});
+
 // 登出
 router.post('/logout', (req: Request, res: Response) => {
   req.session.destroy((err) => {

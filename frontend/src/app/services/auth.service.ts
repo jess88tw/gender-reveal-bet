@@ -38,6 +38,8 @@ export class AuthService {
   ) {
     // 初始化時檢查登入狀態
     this.checkAuthStatus();
+    // 處理 redirect 模式登入後的錯誤參數
+    this.handleRedirectLoginResult();
   }
 
   private checkAuthStatus(): void {
@@ -51,26 +53,39 @@ export class AuthService {
       });
   }
 
+  /** 處理 redirect 模式登入後的 URL 參數 */
+  private handleRedirectLoginResult(): void {
+    const params = new URLSearchParams(window.location.search);
+    const loginError = params.get('login_error');
+    if (loginError) {
+      this.loginErrorSignal.set('Google 登入失敗，請再試一次');
+      // 清除 URL 中的錯誤參數
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }
+
   loginWithGoogle(): void {
     this.loginErrorSignal.set(null);
-
-    // 使用 Google Identity Services
-    google.accounts.id.initialize({
-      client_id: this.configService.googleClientId(),
-      callback: (response: any) => {
-        this.ngZone.run(() => {
-          this.handleGoogleCredential(response.credential);
-        });
-      },
-      // 啟用新的 FedCM 模式（消除 console 警告）
-      use_fedcm_for_prompt: true,
-    });
 
     // 判斷是否為手機裝置
     const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
     if (isMobile) {
-      // 手機上直接用 Google 原生按鈕（One Tap 在手機上常失效）
+      // 手機：使用 redirect 模式
+      // GIS popup/iframe 在手機瀏覽器上常卡在 /gsi/transform，
+      // 改用 ux_mode:'redirect'，Google 會將 credential POST 到 login_uri
+      const loginUri = environment.apiUrl.startsWith('http')
+        ? `${environment.apiUrl}/auth/google-redirect`
+        : `${window.location.origin}${environment.apiUrl}/auth/google-redirect`;
+
+      google.accounts.id.initialize({
+        client_id: this.configService.googleClientId(),
+        login_uri: loginUri,
+        ux_mode: 'redirect',
+        use_fedcm_for_prompt: true,
+      });
+
+      // 顯示 Google 原生按鈕（點擊後會整頁 redirect 到 Google 登入）
       this.ngZone.run(() => this.showGoogleRenderedBtnSignal.set(true));
       setTimeout(() => {
         const btnEl = document.getElementById('google-signin-btn');
@@ -85,7 +100,17 @@ export class AuthService {
         }
       });
     } else {
-      // 桌面端先嘗試 One Tap
+      // 桌面端：使用 popup 模式（One Tap + fallback 按鈕）
+      google.accounts.id.initialize({
+        client_id: this.configService.googleClientId(),
+        callback: (response: any) => {
+          this.ngZone.run(() => {
+            this.handleGoogleCredential(response.credential);
+          });
+        },
+        use_fedcm_for_prompt: true,
+      });
+
       google.accounts.id.prompt((notification: any) => {
         if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
           // One Tap 無法顯示或被跳過，改用按鈕式登入

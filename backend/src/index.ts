@@ -35,6 +35,7 @@ app.use(helmet({
       imgSrc: ["'self'", "data:", "https:", "blob:"],
       connectSrc: ["'self'", "https://accounts.google.com"],
       frameSrc: ["'self'", "https://accounts.google.com"],
+      formAction: ["'self'", "https://accounts.google.com"],
     },
   } : false,
 }));
@@ -55,7 +56,7 @@ app.use(session({
     secure: isProduction, // HTTPS only in production
     httpOnly: true,
     maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
-    sameSite: isProduction ? 'strict' : 'lax',
+    sameSite: 'lax',
   },
 }));
 
