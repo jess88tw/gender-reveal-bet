@@ -8,7 +8,7 @@
   display: flex;
   align-items: center;
   gap: 15px;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
 .back-btn {
@@ -19,12 +19,6 @@
 .page-header h1 {
   font-size: 1.5rem;
   margin: 0;
-}
-
-.intro {
-  text-align: center;
-  color: #666;
-  margin-bottom: 30px;
 }
 
 /* Loading & Empty States */
@@ -56,7 +50,207 @@
   font-size: 1.2rem;
 }
 
-/* Clues Grid */
+/* ===== Symptom Comparison Card ===== */
+.symptom-card {
+  background: linear-gradient(160deg, #4a5568 0%, #2d3748 100%);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  margin-bottom: 30px;
+}
+
+.symptom-card-header {
+  text-align: center;
+  padding: 28px 20px 18px;
+  position: relative;
+}
+
+.header-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.9);
+  font-family: 'Georgia', serif;
+  font-style: italic;
+  letter-spacing: 2px;
+}
+
+.header-or {
+  font-size: 1.3rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0 12px;
+  font-style: italic;
+}
+
+/* Symptom Table */
+.symptom-table {
+  padding: 0 16px;
+}
+
+.table-header {
+  display: grid;
+  grid-template-columns: 1fr 70px 1fr;
+  gap: 8px;
+  padding: 8px 4px;
+  margin-bottom: 4px;
+}
+
+.col-boy-header,
+.col-girl-header {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.col-boy-header {
+  text-align: right;
+}
+
+.col-girl-header {
+  text-align: left;
+}
+
+.col-cat-header {
+  text-align: center;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 600;
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns: 1fr 70px 1fr;
+  gap: 8px;
+  padding: 8px 4px;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.col-boy-val {
+  text-align: right;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.95rem;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: all 0.3s;
+  position: relative;
+}
+
+.col-girl-val {
+  text-align: left;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.95rem;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: all 0.3s;
+  position: relative;
+}
+
+.col-boy-val.checked {
+  background: rgba(66, 165, 245, 0.15);
+  color: #90caf9;
+  font-weight: 600;
+}
+
+.col-girl-val.checked {
+  background: rgba(240, 98, 146, 0.15);
+  color: #f48fb1;
+  font-weight: 600;
+}
+
+.check-mark {
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin: 0 4px;
+}
+
+.col-cat-val {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 700;
+  font-size: 0.85rem;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+/* Score Summary */
+.score-summary {
+  padding: 16px 20px;
+}
+
+.score-bar {
+  display: flex;
+  height: 36px;
+  border-radius: 18px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.score-fill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: flex 0.5s ease;
+  min-width: 0;
+}
+
+.score-fill.boy {
+  background: linear-gradient(135deg, #42a5f5, #1565c0);
+  color: white;
+}
+
+.score-fill.girl {
+  background: linear-gradient(135deg, #f06292, #c62828);
+  color: white;
+}
+
+/* Parents' Predictions */
+.predictions-display {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  padding: 12px 20px 24px;
+  flex-wrap: wrap;
+}
+
+.pred-tag {
+  display: inline-block;
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.pred-tag.boy {
+  background: rgba(66, 165, 245, 0.2);
+  color: #90caf9;
+  border: 1px solid rgba(66, 165, 245, 0.3);
+}
+
+.pred-tag.girl {
+  background: rgba(240, 98, 146, 0.2);
+  color: #f48fb1;
+  border: 1px solid rgba(240, 98, 146, 0.3);
+}
+
+/* ===== Section Title ===== */
+.section-title {
+  font-size: 1.2rem;
+  margin-bottom: 16px;
+  color: #333;
+}
+
+/* ===== Clues Grid ===== */
 .clues-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -212,5 +406,35 @@
 @media (max-width: 600px) {
   .clues-grid {
     grid-template-columns: 1fr;
+  }
+
+  .header-title {
+    font-size: 1.6rem;
+  }
+
+  .table-header {
+    display: none;
+  }
+
+  .table-row {
+    grid-template-columns: 1fr 60px 1fr;
+    gap: 4px;
+  }
+
+  .col-boy-val,
+  .col-girl-val {
+    font-size: 0.85rem;
+    padding: 5px 6px;
+  }
+
+  .col-cat-val {
+    font-size: 0.75rem;
+    padding: 3px 4px;
+  }
+
+  .predictions-display {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
   }
 }

@@ -4,62 +4,153 @@
     <h1>🔍 線索大公開</h1>
   </header>
 
-  <p class="intro">看看這些線索，猜猜寶寶是男生還是女生？</p>
-
   @if (loading()) {
     <div class="loading">
       <div class="spinner"></div>
       <p>載入中...</p>
     </div>
-  } @else if (clues().length === 0) {
-    <div class="empty-state">
-      <p>🔮 線索即將公開，敬請期待！</p>
-    </div>
   } @else {
-    <div class="clues-grid">
-      @for (clue of clues(); track clue.id) {
-        <div class="clue-card" (click)="clue.imageUrl && openImage(clue.id)">
-          @if (clue.imageUrl) {
-            <div class="clue-image">
-              <img [src]="clue.imageUrl" [alt]="clue.title" />
-            </div>
-          } @else {
-            <div class="clue-placeholder">
-              <span>{{ getClueTypeLabel(clue.clueType).split(" ")[0] }}</span>
+
+    <!-- Symptom Comparison Table -->
+    @if (symptoms().length > 0) {
+      <div class="symptom-card">
+        <div class="symptom-card-header">
+          <span class="header-title">Boy</span>
+          <span class="header-or">or</span>
+          <span class="header-title">Girl?</span>
+        </div>
+
+        <div class="symptom-table">
+          <div class="table-header">
+            <span class="col-boy-header">👦 男生特徵</span>
+            <span class="col-cat-header">項目</span>
+            <span class="col-girl-header">👧 女生特徵</span>
+          </div>
+
+          @for (symptom of symptoms(); track symptom.id) {
+            <div class="table-row">
+              <span
+                class="col-boy-val"
+                [class.checked]="symptom.checkedGender === 'BOY'"
+              >
+                {{ symptom.boyDescription }}
+                @if (symptom.checkedGender === 'BOY') {
+                  <span class="check-mark">✓</span>
+                }
+              </span>
+              <span class="col-cat-val">{{ symptom.category }}</span>
+              <span
+                class="col-girl-val"
+                [class.checked]="symptom.checkedGender === 'GIRL'"
+              >
+                @if (symptom.checkedGender === 'GIRL') {
+                  <span class="check-mark">✓</span>
+                }
+                {{ symptom.girlDescription }}
+              </span>
             </div>
           }
-          <div class="clue-content">
-            <span class="clue-type">{{ getClueTypeLabel(clue.clueType) }}</span>
-            <h3>{{ clue.title }}</h3>
-            @if (clue.description) {
-              <p>{{ clue.description }}</p>
+        </div>
+
+        <!-- Score Summary -->
+        @if (boyCheckedCount() > 0 || girlCheckedCount() > 0) {
+          <div class="score-summary">
+            <div class="score-bar">
+              <div
+                class="score-fill boy"
+                [style.flex]="boyCheckedCount()"
+              >
+                @if (boyCheckedCount() > 0) {
+                  👦 {{ boyCheckedCount() }}
+                }
+              </div>
+              <div
+                class="score-fill girl"
+                [style.flex]="girlCheckedCount()"
+              >
+                @if (girlCheckedCount() > 0) {
+                  👧 {{ girlCheckedCount() }}
+                }
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Parents' Predictions -->
+        @if (dadPrediction() || momPrediction()) {
+          <div class="predictions-display">
+            @if (dadPrediction()) {
+              <span class="pred-tag" [class.boy]="dadPrediction() === 'BOY'" [class.girl]="dadPrediction() === 'GIRL'">
+                爸爸預測：{{ dadPrediction() === 'BOY' ? '👦 男' : '👧 女' }}
+              </span>
+            }
+            @if (momPrediction()) {
+              <span class="pred-tag" [class.boy]="momPrediction() === 'BOY'" [class.girl]="momPrediction() === 'GIRL'">
+                媽媽預測：{{ momPrediction() === 'BOY' ? '👦 男' : '👧 女' }}
+              </span>
             }
           </div>
-        </div>
-      }
-    </div>
-  }
+        }
+      </div>
+    }
 
-  <!-- Image Modal -->
-  @if (selectedClue()) {
-    <div class="modal-overlay" (click)="closeImage()">
-      <div class="modal-content" (click)="$event.stopPropagation()">
+    <!-- Other Clues -->
+    @if (clues().length > 0) {
+      <h2 class="section-title">📎 其他線索</h2>
+      <div class="clues-grid">
         @for (clue of clues(); track clue.id) {
-          @if (clue.id === selectedClue() && clue.imageUrl) {
-            <img [src]="clue.imageUrl" [alt]="clue.title" />
-            <h3>{{ clue.title }}</h3>
-            @if (clue.description) {
-              <p>{{ clue.description }}</p>
+          <div class="clue-card" (click)="clue.imageUrl && openImage(clue.id)">
+            @if (clue.imageUrl) {
+              <div class="clue-image">
+                <img [src]="clue.imageUrl" [alt]="clue.title" />
+              </div>
+            } @else {
+              <div class="clue-placeholder">
+                <span>{{ getClueTypeLabel(clue.clueType).split(" ")[0] }}</span>
+              </div>
+            }
+            <div class="clue-content">
+              <span class="clue-type">{{ getClueTypeLabel(clue.clueType) }}</span>
+              <h3>{{ clue.title }}</h3>
+              @if (clue.description) {
+                <p>{{ clue.description }}</p>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Empty State -->
+    @if (symptoms().length === 0 && clues().length === 0) {
+      <div class="empty-state">
+        <p>🔮 線索即將公開，敬請期待！</p>
+      </div>
+    }
+
+    <!-- Image Modal -->
+    @if (selectedClue()) {
+      <div class="modal-overlay" (click)="closeImage()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+          @for (clue of clues(); track clue.id) {
+            @if (clue.id === selectedClue() && clue.imageUrl) {
+              <img [src]="clue.imageUrl" [alt]="clue.title" />
+              <h3>{{ clue.title }}</h3>
+              @if (clue.description) {
+                <p>{{ clue.description }}</p>
+              }
             }
           }
-        }
-        <button class="close-btn" (click)="closeImage()">✕</button>
+          <button class="close-btn" (click)="closeImage()">✕</button>
+        </div>
       </div>
-    </div>
-  }
+    }
 
-  <!-- Navigation -->
-  <div class="nav-section">
-    <a routerLink="/bet" class="btn btn-primary">看完線索，立即下注！</a>
-  </div>
+    <!-- Navigation -->
+    @if (!isRevealed()) {
+      <div class="nav-section">
+        <a routerLink="/bet" class="btn btn-primary">看完線索，立即下注！</a>
+      </div>
+    }
+  }
 </div>
