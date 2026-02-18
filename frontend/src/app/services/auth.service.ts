@@ -82,25 +82,9 @@ export class AuthService {
         client_id: this.configService.googleClientId(),
         login_uri: loginUri,
         ux_mode: 'redirect',
-        use_fedcm_for_prompt: true,
-      });
-
-      // 顯示 Google 原生按鈕（點擊後會整頁 redirect 到 Google 登入）
-      this.ngZone.run(() => this.showGoogleRenderedBtnSignal.set(true));
-      setTimeout(() => {
-        const btnEl = document.getElementById('google-signin-btn');
-        if (btnEl) {
-          google.accounts.id.renderButton(btnEl, {
-            theme: 'outline',
-            size: 'large',
-            text: 'signin_with',
-            locale: 'zh-TW',
-            width: 280,
-          });
-        }
       });
     } else {
-      // 桌面端：使用 popup 模式（One Tap + fallback 按鈕）
+      // 桌面端：使用 popup 模式，按鈕點擊觸發
       google.accounts.id.initialize({
         client_id: this.configService.googleClientId(),
         callback: (response: any) => {
@@ -108,25 +92,23 @@ export class AuthService {
             this.handleGoogleCredential(response.credential);
           });
         },
-        use_fedcm_for_prompt: true,
-      });
-
-      google.accounts.id.prompt((notification: any) => {
-        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-          // One Tap 無法顯示或被跳過，改用按鈕式登入
-          this.ngZone.run(() => this.showGoogleRenderedBtnSignal.set(true));
-          const btnEl = document.getElementById('google-signin-btn');
-          if (btnEl) {
-            google.accounts.id.renderButton(btnEl, {
-              theme: 'outline',
-              size: 'large',
-              text: 'signin_with',
-              locale: 'zh-TW',
-            });
-          }
-        }
       });
     }
+
+    // 不使用 One Tap / FedCM（容易被瀏覽器封鎖），直接顯示 Google 原生按鈕
+    this.ngZone.run(() => this.showGoogleRenderedBtnSignal.set(true));
+    setTimeout(() => {
+      const btnEl = document.getElementById('google-signin-btn');
+      if (btnEl) {
+        google.accounts.id.renderButton(btnEl, {
+          theme: 'outline',
+          size: 'large',
+          text: 'signin_with',
+          locale: 'zh-TW',
+          width: 280,
+        });
+      }
+    });
   }
 
   private handleGoogleCredential(token: string): void {
