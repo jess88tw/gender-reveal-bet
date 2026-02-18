@@ -82,24 +82,25 @@ backend/.env  ──→  GET /api/config  ──→  前端 ConfigService (APP_I
   - 查看所有下注 / 付款確認
   - 性別揭曉
   - 抽獎系統（猜對者中抽一位，獎金扣 10% 手續費）
-  - 清空資料（開發用）
+  - 揭曉狀態 API（`GET /api/admin/reveal-status` — 含得獎者資訊與獎金明細）
+  - 清空資料（開發用）— 自動銷毀 Session 避免殘留登入狀態
 
 ### 前端介面
 
-- ✅ 首頁 (`home.component`) - 統計顯示 + 管理員入口
-- ✅ 下注頁面 (`betting.component`) - 選擇性別，固定 NT$200
-- ✅ 我的下注 (`my-bets.component`) - 個人下注記錄 + 付款狀態
+- ✅ 首頁 (`home.component`) - 統計顯示 + 管理員入口 + 揭曉動態效果（性別色彩變化）+ 得獎者公告卡片 + 揭曉後「敬請期待」提示 + 每 30 秒自動更新狀態
+- ✅ 下注頁面 (`betting.component`) - 選擇性別，固定 NT$200 + 三種付款方式專屬成功畫面（銀行轉帳/LINE Pay/現金）
+- ✅ 我的下注 (`my-bets.component`) - Hero 下注卡片 + 付款方式專屬提醒 + 下注詳情
 - ✅ 線索頁面 (`clues.component`) - 顯示所有線索
 - ✅ 參與者列表 (`participants.component`) - 顯示性別選擇
-- ✅ 管理後台 (`admin.component`) - 付款確認、揭曉、抽獎、清除資料
+- ✅ 管理後台 (`admin.component`) - 付款確認、揭曉、抽獎、清除資料 + 得獎資訊持久化 + 清除資料時自動登出並導向首頁
 
 ### 前端服務
 
 - ✅ 設定服務 (`config.service.ts`) - 啟動時從後端載入設定，使用 `APP_INITIALIZER`
-- ✅ 認證服務 (`auth.service.ts`) - Google GIS 登入，使用 signals
-- ✅ 下注服務 (`bet.service.ts`) - 使用 signals
+- ✅ 認證服務 (`auth.service.ts`) - Google GIS 登入，使用 signals + 取消登入不破版 + `clearUser()` 方法
+- ✅ 下注服務 (`bet.service.ts`) - 使用 signals + 揭曉狀態查詢 + 得獎者/獎金資訊
 - ✅ 線索服務 (`clue.service.ts`) - 使用 signals
-- ✅ 管理服務 (`admin.service.ts`) - 使用 signals
+- ✅ 管理服務 (`admin.service.ts`) - 使用 signals + 得獎者/獎金持久化 signals
 
 ### 資料庫
 
@@ -127,7 +128,7 @@ backend/.env  ──→  GET /api/config  ──→  前端 ConfigService (APP_I
 ## 🔒 安全注意事項
 
 1. **環境變數**: 絕對不要提交 `.env` 到 Git — 已透過 `.gitignore` 排除
-2. **設定分離**: 所有個人 ID / Email 統一放在 `backend/.env`，原始碼中不含硬編碼
+2. **設定分離**: 所有個人 ID / Email 統一放在 `backend/.env`，原始碼中不含硬編碼（包含銀行帳號等付款資訊，一律提示「請私訊主辦人」）
 3. **Config API**: `GET /api/config` 只回傳可公開資料（Google Client ID、Admin Emails），不回傳密碼或 Secret
 4. **Session Secret**: 使用強密碼並定期更換
 5. **輸入驗證**: 後端必須驗證所有輸入
