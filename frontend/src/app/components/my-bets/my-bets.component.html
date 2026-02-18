@@ -6,6 +6,7 @@
 
   @if (!isLoggedIn()) {
     <div class="login-prompt">
+      <div class="login-prompt-icon">🔒</div>
       <p>請先登入查看您的下注記錄</p>
       <a routerLink="/" class="btn btn-primary">返回首頁登入</a>
     </div>
@@ -17,48 +18,106 @@
   } @else {
     @if (myBets().length === 0) {
       <div class="empty-state">
-        <p>您還沒有下注記錄</p>
+        <div class="empty-icon">🎲</div>
+        <h3>尚未下注</h3>
+        <p>您還沒有下注記錄，快來參與吧！</p>
         <a routerLink="/bet" class="btn btn-primary">立即下注</a>
       </div>
     } @else {
-      <!-- My Bet Info -->
       @for (bet of myBets(); track bet.id) {
-        <div class="my-bet-card" [class.boy]="bet.gender === 'BOY'" [class.girl]="bet.gender === 'GIRL'">
-          <div class="bet-icon">
-            {{ bet.gender === 'BOY' ? '👦' : '👧' }}
-          </div>
-          <div class="bet-info">
-            <p class="bet-gender">
-              我押 {{ bet.gender === 'BOY' ? '男生' : '女生' }}
-            </p>
-            <p class="bet-amount">NT$ {{ bet.amount | number }}</p>
-            <p class="bet-date">
-              {{ bet.createdAt | date:'yyyy/MM/dd HH:mm' }}
-            </p>
-          </div>
-          <div
-            class="bet-status"
-            [class.paid]="bet.isPaid"
-            [class.unpaid]="!bet.isPaid"
-          >
+        <!-- Hero Bet Card -->
+        <div class="bet-hero" [class.boy]="bet.gender === 'BOY'" [class.girl]="bet.gender === 'GIRL'">
+          <div class="bet-hero-icon">{{ bet.gender === 'BOY' ? '👦' : '👧' }}</div>
+          <h2 class="bet-hero-label">我押 {{ bet.gender === 'BOY' ? '男生' : '女生' }}</h2>
+          <p class="bet-hero-amount">NT$ {{ bet.amount | number }}</p>
+          <div class="bet-hero-badge" [class.paid]="bet.isPaid" [class.unpaid]="!bet.isPaid">
             @if (bet.isPaid) {
-              ✓ 已付款
+              ✅ 已確認付款
             } @else {
-              待付款
+              ⏳ 待付款
             }
           </div>
         </div>
+
+        <!-- Bet Details -->
+        <div class="bet-details-card">
+          <h3>📝 下注明細</h3>
+          <div class="detail-row">
+            <span class="detail-label">下注性別</span>
+            <span class="detail-value">{{ bet.gender === 'BOY' ? '👦 男生' : '👧 女生' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">下注金額</span>
+            <span class="detail-value highlight">NT$ {{ bet.amount | number }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">付款方式</span>
+            <span class="detail-value">
+              @if (bet.paymentMethod === 'bank_transfer') {
+                🏦 銀行轉帳
+              } @else if (bet.paymentMethod === 'line_pay') {
+                💚 LINE Pay
+              } @else if (bet.paymentMethod === 'cash') {
+                💵 現金
+              } @else {
+                —
+              }
+            </span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">付款狀態</span>
+            <span class="detail-value">
+              @if (bet.isPaid) {
+                <span class="status-tag paid">已付款</span>
+              } @else {
+                <span class="status-tag unpaid">待付款</span>
+              }
+            </span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">下注時間</span>
+            <span class="detail-value">{{ bet.createdAt | date:'yyyy/MM/dd HH:mm' }}</span>
+          </div>
+        </div>
+
+        <!-- Payment Reminder -->
+        @if (!bet.isPaid) {
+          <div class="payment-reminder">
+            <h4>💳 付款提醒</h4>
+            <p>請於下注後 <strong>3 日內</strong>完成付款</p>
+            @if (bet.paymentMethod === 'bank_transfer') {
+              <div class="payment-info">
+                <p class="payment-info-label">🏦 銀行轉帳資訊</p>
+                <!-- TODO: 把敏感資料都放到一個 config 或環境變數中 -->
+                <p>匯款帳號: XXX-XXXX-XXXX-XXXX</p>
+                <p>匯款後請通知主辦人確認</p>
+              </div>
+            } @else if (bet.paymentMethod === 'line_pay') {
+              <div class="payment-info">
+                <p class="payment-info-label">💚 LINE Pay</p>
+                <p>請透過 LINE Pay 轉帳給主辦人</p>
+                <p>轉帳後請截圖通知主辦人確認</p>
+              </div>
+            } @else if (bet.paymentMethod === 'cash') {
+              <div class="payment-info">
+                <p class="payment-info-label">💵 現金付款</p>
+                <p>請當面交給主辦人</p>
+              </div>
+            } @else {
+              <div class="payment-info">
+                <p>匯款帳號: XXX-XXXX-XXXX-XXXX</p>
+                <p>匯款後請通知主辦人確認</p>
+              </div>
+            }
+          </div>
+        }
       }
 
-      @if (!myBets()[0].isPaid) {
-        <div class="payment-reminder">
-          <h4>💳 付款提醒</h4>
-          <p>請於下注後 3 日內完成付款</p>
-          <!-- TODO: 把敏感資料都放到一個 config 或環境變數中 -->
-          <p>匯款帳號: XXX-XXXX-XXXX-XXXX</p>
-          <p>匯款後請通知主辦人確認</p>
-        </div>
-      }
+      <!-- Navigation -->
+      <div class="action-section">
+        <a routerLink="/" class="btn btn-secondary">🏠 回首頁</a>
+        <a routerLink="/participants" class="btn btn-outline">👥 參與者</a>
+      </div>
     }
   }
 </div>
