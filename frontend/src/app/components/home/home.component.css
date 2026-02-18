@@ -306,6 +306,49 @@
   background: #00a000;
 }
 
+/* Stay Tuned Section */
+.stay-tuned-section {
+  margin-bottom: 30px;
+}
+
+.stay-tuned-card {
+  text-align: center;
+  padding: 35px 25px;
+  background: linear-gradient(135deg, #fff9e6 0%, #fff3cd 100%);
+  border-radius: 20px;
+  border: 2px solid #f1c40f;
+  box-shadow: 0 5px 20px rgba(241, 196, 15, 0.2);
+}
+
+.stay-tuned-icon {
+  font-size: 3rem;
+  margin-bottom: 10px;
+  animation: pulse 1.5s ease infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+.stay-tuned-card h2 {
+  font-size: 1.4rem;
+  color: #e67e22;
+  margin-bottom: 8px;
+}
+
+.stay-tuned-card p {
+  color: #666;
+  font-size: 1rem;
+}
+
+.stay-tuned-hint {
+  margin-top: 12px;
+  font-weight: 600;
+  color: #e67e22 !important;
+  font-size: 1.05rem !important;
+}
+
 /* Winner Section */
 .winner-section {
   margin-bottom: 30px;

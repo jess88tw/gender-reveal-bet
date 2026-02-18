@@ -11,8 +11,17 @@
     }
   </section>
 
-  <!-- Winner Announcement -->
-  @if (winner()) {
+  <!-- Stay Tuned / Winner Announcement -->
+  @if (isRevealed() && !winner()) {
+    <section class="stay-tuned-section">
+      <div class="stay-tuned-card">
+        <div class="stay-tuned-icon">🥁</div>
+        <h2>即將抽獎！</h2>
+        <p>性別已揭曉，抽獎即將開始⋯</p>
+        <p class="stay-tuned-hint">🙏 先不要離開，馬上公布幸運得主！</p>
+      </div>
+    </section>
+  } @else if (winner()) {
     <section class="winner-section">
       <div class="winner-card">
         <div class="winner-badge">🏆</div>
