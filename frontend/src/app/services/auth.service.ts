@@ -82,6 +82,7 @@ export class AuthService {
         client_id: this.configService.googleClientId(),
         login_uri: loginUri,
         ux_mode: 'redirect',
+        use_fedcm_for_prompt: false,
       });
     } else {
       // 桌面端：使用 popup 模式
@@ -92,6 +93,7 @@ export class AuthService {
             this.handleGoogleCredential(response.credential);
           });
         },
+        use_fedcm_for_prompt: false,
       });
 
       // 先嘗試 One Tap（不使用 FedCM），失敗才 fallback 到按鈕
