@@ -13,9 +13,13 @@ export class AdminService {
   // 使用 Signal 管理狀態
   private allBetsSignal = signal<Bet[]>([]);
   private revealConfigSignal = signal<RevealConfig | null>(null);
+  private winnerSignal = signal<{ id: string; name: string; avatarUrl?: string } | null>(null);
+  private prizeInfoSignal = signal<{ totalPool: number; fee: number; winnerPrize: number } | null>(null);
 
   readonly allBets = this.allBetsSignal.asReadonly();
   readonly revealConfig = this.revealConfigSignal.asReadonly();
+  readonly winner = this.winnerSignal.asReadonly();
+  readonly prizeInfo = this.prizeInfoSignal.asReadonly();
 
   constructor(private http: HttpClient) {}
 
@@ -33,12 +37,16 @@ export class AdminService {
     );
   }
 
-  getRevealConfig(): Observable<{ config: RevealConfig }> {
+  getRevealConfig(): Observable<{ config: RevealConfig; winner: any; prizeInfo: any }> {
     return this.http
-      .get<{ config: RevealConfig }>(`${this.apiUrl}/reveal-status`, {
+      .get<{ config: RevealConfig; winner: any; prizeInfo: any }>(`${this.apiUrl}/reveal-status`, {
         withCredentials: true,
       })
-      .pipe(tap((res) => this.revealConfigSignal.set(res.config)));
+      .pipe(tap((res) => {
+        this.revealConfigSignal.set(res.config);
+        this.winnerSignal.set(res.winner);
+        this.prizeInfoSignal.set(res.prizeInfo);
+      }));
   }
 
   revealGender(

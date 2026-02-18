@@ -27,15 +27,25 @@ export class HomeComponent implements OnInit {
   girlPercentage = this.betService.girlPercentage;
   totalPrizePool = this.betService.totalPrizePool;
 
+  // 揭曉 & 中獎
+  isRevealed = this.betService.isRevealed;
+  revealedGender = this.betService.revealedGender;
+  winner = this.betService.winner;
+  prizeInfo = this.betService.prizeInfo;
+
   loading = signal(true);
 
   ngOnInit(): void {
     this.loadStats();
+    this.betService.getRevealStatus().subscribe();
 
     // 每 30 秒自動更新統計
     interval(30000)
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.loadStats());
+      .subscribe(() => {
+        this.loadStats();
+        this.betService.getRevealStatus().subscribe();
+      });
   }
 
   loadStats(): void {

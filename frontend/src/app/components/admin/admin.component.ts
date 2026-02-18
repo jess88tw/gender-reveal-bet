@@ -22,12 +22,13 @@ export class AdminComponent implements OnInit {
 
   allBets = this.adminService.allBets;
   revealConfig = this.adminService.revealConfig;
+  adminWinner = this.adminService.winner;
+  adminPrizeInfo = this.adminService.prizeInfo;
 
   loading = signal(true);
   actionLoading = signal(false);
   error = signal<string | null>(null);
   successMessage = signal<string | null>(null);
-  drawResult = signal<any>(null);
 
   // 統計
   totalBets = computed(() => this.allBets().length);
@@ -106,7 +107,6 @@ export class AdminComponent implements OnInit {
     this.actionLoading.set(true);
     this.adminService.drawWinner().subscribe({
       next: (res: any) => {
-        this.drawResult.set(res);
         this.successMessage.set(`🎉 恭喜 ${res.winner.name} 中獎！`);
         this.actionLoading.set(false);
         this.loadData();

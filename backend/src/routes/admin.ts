@@ -15,7 +15,29 @@ router.get('/reveal-status', async (req: Request, res: Response) => {
       });
     }
 
-    res.json({ config });
+    // 如果有得獎者，一併回傳得獎者資訊與獎金
+    let winner = null;
+    let prizeInfo = null;
+    if (config.winnerId) {
+      winner = await prisma.user.findUnique({
+        where: { id: config.winnerId },
+        select: { id: true, name: true, avatarUrl: true },
+      });
+
+      const allPaidBets = await prisma.bet.aggregate({
+        where: { isPaid: true },
+        _sum: { amount: true },
+      });
+      const totalPool = allPaidBets._sum.amount || 0;
+      const fee = Math.round(totalPool * 0.1);
+      prizeInfo = {
+        totalPool,
+        fee,
+        winnerPrize: totalPool - fee,
+      };
+    }
+
+    res.json({ config, winner, prizeInfo });
   } catch (error) {
     console.error('Get reveal status error:', error);
     res.status(500).json({ error: 'Failed to get reveal status' });

@@ -114,12 +114,14 @@
           @if (revealConfig()!.winnerId) {
             <div class="winner-info">
               <p>🏆 得獎者已抽出</p>
-              @if (drawResult()) {
+              @if (adminWinner()) {
                 <div class="winner-detail">
-                  <p class="winner-name">🎊 {{ drawResult().winner.name }}</p>
-                  <p>總獎金池：NT$ {{ drawResult().totalPool | number }}</p>
-                  <p>手續費 (10%)：NT$ {{ drawResult().fee | number }}</p>
-                  <p class="prize-amount">得主獎金：NT$ {{ drawResult().winnerPrize | number }}</p>
+                  <p class="winner-name">🎊 {{ adminWinner()!.name }}</p>
+                  @if (adminPrizeInfo()) {
+                    <p>總獎金池：NT$ {{ adminPrizeInfo()!.totalPool | number }}</p>
+                    <p>手續費 (10%)：NT$ {{ adminPrizeInfo()!.fee | number }}</p>
+                    <p class="prize-amount">得主獎金：NT$ {{ adminPrizeInfo()!.winnerPrize | number }}</p>
+                  }
                 </div>
               }
             </div>

@@ -1,9 +1,51 @@
 <div class="home-container">
   <!-- Hero Section -->
-  <section class="hero">
-    <h1>🎀 寶寶性別揭曉派對 👶</h1>
-    <p class="subtitle">猜猜看是男生還是女生？</p>
+  <section class="hero" [class.hero-boy]="isRevealed() && revealedGender() === 'BOY'" [class.hero-girl]="isRevealed() && revealedGender() === 'GIRL'">
+    @if (isRevealed()) {
+      <div class="reveal-confetti">🎊</div>
+      <h1>{{ revealedGender() === 'BOY' ? '👦' : '👧' }} 是{{ revealedGender() === 'BOY' ? '男生' : '女生' }}！</h1>
+      <p class="subtitle">🎉 性別已揭曉！感謝大家的參與！</p>
+    } @else {
+      <h1>🎀 寶寶性別揭曉派對 👶</h1>
+      <p class="subtitle">猜猜看是男生還是女生？</p>
+    }
   </section>
+
+  <!-- Winner Announcement -->
+  @if (winner()) {
+    <section class="winner-section">
+      <div class="winner-card">
+        <div class="winner-badge">🏆</div>
+        <h2>恭喜中獎！</h2>
+        <div class="winner-info">
+          <div class="winner-avatar">
+            @if (winner()!.avatarUrl) {
+              <img [src]="winner()!.avatarUrl" [alt]="winner()!.name" />
+            } @else {
+              <span class="winner-initials">{{ winner()!.name.charAt(0) }}</span>
+            }
+          </div>
+          <p class="winner-name">🎉 {{ winner()!.name }} 🎉</p>
+        </div>
+        @if (prizeInfo()) {
+          <div class="prize-details">
+            <div class="prize-row">
+              <span>總獎金池</span>
+              <span>NT$ {{ prizeInfo()!.totalPool | number }}</span>
+            </div>
+            <div class="prize-row">
+              <span>手續費（10% 奶粉錢 🍼）</span>
+              <span class="fee">- NT$ {{ prizeInfo()!.fee | number }}</span>
+            </div>
+            <div class="prize-row total">
+              <span>得主獎金</span>
+              <span class="prize-amount">NT$ {{ prizeInfo()!.winnerPrize | number }}</span>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+  }
 
   <!-- Stats Section -->
   <section class="stats-section">
@@ -75,7 +117,9 @@
       <div class="user-info">
         <p>歡迎, {{ currentUser()?.name }}!</p>
         <div class="action-buttons">
-          <a routerLink="/bet" class="btn btn-primary">立即下注</a>
+          @if (!isRevealed()) {
+            <a routerLink="/bet" class="btn btn-primary">立即下注</a>
+          }
           <a routerLink="/my-bets" class="btn btn-secondary">我的下注</a>
           @if (isAdmin()) {
             <a routerLink="/admin" class="btn btn-admin">⚙️ 管理後台</a>

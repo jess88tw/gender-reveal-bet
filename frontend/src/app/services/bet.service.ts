@@ -2,23 +2,38 @@ import { HttpClient } from '@angular/common/http';
 import { computed, Injectable, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { Bet, BetStats, Participant } from '../models/types';
+import { Bet, BetStats, Participant, RevealConfig, User } from '../models/types';
+
+export interface RevealStatus {
+  config: RevealConfig;
+  winner: { id: string; name: string; avatarUrl?: string } | null;
+  prizeInfo: { totalPool: number; fee: number; winnerPrize: number } | null;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class BetService {
   private readonly apiUrl = `${environment.apiUrl}/bets`;
+  private readonly adminApiUrl = `${environment.apiUrl}/admin`;
 
   // 使用 Signal 管理狀態
   private statsSignal = signal<BetStats | null>(null);
   private myBetsSignal = signal<Bet[]>([]);
   private participantsSignal = signal<Participant[]>([]);
+  private revealStatusSignal = signal<RevealStatus | null>(null);
 
   // 公開的 readonly signals
   readonly stats = this.statsSignal.asReadonly();
   readonly myBets = this.myBetsSignal.asReadonly();
   readonly participants = this.participantsSignal.asReadonly();
+  readonly revealStatus = this.revealStatusSignal.asReadonly();
+
+  // Reveal computed helpers
+  readonly isRevealed = computed(() => this.revealStatusSignal()?.config?.isRevealed ?? false);
+  readonly revealedGender = computed(() => this.revealStatusSignal()?.config?.revealedGender ?? null);
+  readonly winner = computed(() => this.revealStatusSignal()?.winner ?? null);
+  readonly prizeInfo = computed(() => this.revealStatusSignal()?.prizeInfo ?? null);
 
   // Computed values
   readonly totalPrizePool = computed(() => {
@@ -73,5 +88,13 @@ export class BetService {
   refreshAll(): void {
     this.getStats().subscribe();
     this.getParticipants().subscribe();
+    this.getRevealStatus().subscribe();
+  }
+
+  getRevealStatus(): Observable<RevealStatus> {
+    return this.http
+      .get<RevealStatus>(`${this.adminApiUrl}/reveal-status`)
+      .pipe(tap((status) => this.revealStatusSignal.set(status)));
   }
 }
+
