@@ -1,219 +1,182 @@
 # 部署指南
 
-## 部署架構
+## 部署架構（合併部署）
 
 ```
-Frontend (Angular 17) → Vercel/Netlify
-Backend (Express)     → Railway/Render
-Database (MongoDB)    → MongoDB Atlas (雲端)
+┌─────────────────────────────────────────┐
+│            Render (Web Service)          │
+│                                         │
+│   Express Server (Node.js)              │
+│   ├── /api/*     → API 路由             │
+│   └── /*         → Angular 靜態檔案     │
+│                                         │
+│   前後端同一個服務，同一個網域           │
+│   https://your-app.onrender.com         │
+└─────────────────────────────────────────┘
+              │
+              ▼
+┌─────────────────────────────────────────┐
+│         MongoDB Atlas (雲端資料庫)       │
+└─────────────────────────────────────────┘
 ```
 
-## 資料庫 (MongoDB Atlas)
+> **為什麼合併部署？** Session cookie 不會有跨域問題，部署管理只需一個服務。
 
-MongoDB Atlas 是雲端資料庫，不需要額外部署。
+## 前置準備
 
-1. 前往 [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
-2. 登入你的帳號
-3. 在 Network Access 加入生產環境的 IP（或 0.0.0.0/0 允許所有）
-4. 複製連線字串供後端使用
+### 1. MongoDB Atlas
 
-## 後端部署 (Railway)
+資料庫已在使用中，部署前需確認：
 
-### 1. 部署後端
+1. 前往 [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) → Network Access
+2. **加入 `0.0.0.0/0`**（允許所有 IP，Render 免費方案無固定 IP）
+3. 複製連線字串備用
+
+### 2. Google OAuth 設定
+
+1. 前往 [Google Cloud Console](https://console.cloud.google.com/) → APIs & Services → Credentials
+2. 編輯你的 OAuth 2.0 Client ID
+3. 在「授權的 JavaScript 來源」加入：
+   - `https://your-app.onrender.com`（Render 給你的網址）
+4. 在「授權的重新導向 URI」加入：
+   - `https://your-app.onrender.com`
+
+### 3. GitHub Repository
+
+把程式碼推到 GitHub：
 
 ```bash
-cd backend
-
-# 初始化 Git (如果還沒有的話)
-git init
-git add .
-git commit -m "Initial commit"
-
-# 連接到 Railway
-railway login
-railway link
-railway up
+# 如果還沒有 remote
+git remote add origin https://github.com/你的帳號/gender-reveal-bet.git
+git push -u origin main
 ```
+
+## 部署步驟（Render）
+
+### 1. 建立 Web Service
+
+1. 登入 [Render](https://render.com)（建議用 GitHub 帳號）
+2. 點選 **New** → **Web Service**
+3. 連結你的 GitHub repo（`gender-reveal-bet`）
+4. 填入以下設定：
+
+| 欄位 | 值 |
+|------|-----|
+| **Name** | `gender-reveal-bet`（或任何名稱） |
+| **Region** | Singapore（離台灣最近） |
+| **Branch** | `main` |
+| **Runtime** | `Node` |
+| **Build Command** | `npm run render:build` |
+| **Start Command** | `npm start` |
+| **Plan** | Free |
 
 ### 2. 設定環境變數
 
-在 Railway Dashboard 設定以下環境變數:
+在 Render Dashboard → Environment 加入：
 
-```
-DATABASE_URL=<你的 MongoDB Atlas 連線字串>
-NODE_ENV=production
-FRONTEND_URL=<你的前端網址>
-GOOGLE_CLIENT_ID=<Google OAuth Client ID>
-ADMIN_EMAILS=<管理員 Email，多位用逗號分隔>
-SESSION_SECRET=<隨機產生的密鑰>
-PORT=3333
-```
+| 變數 | 值 | 說明 |
+|------|-----|------|
+| `NODE_ENV` | `production` | 啟用正式模式 |
+| `DATABASE_URL` | `mongodb+srv://...` | MongoDB Atlas 連線字串 |
+| `GOOGLE_CLIENT_ID` | `xxx.apps.googleusercontent.com` | Google OAuth ID |
+| `ADMIN_EMAILS` | `your@email.com` | 管理員 Email |
+| `SESSION_SECRET` | （自動產生或自訂強密碼） | Session 加密 |
 
-### 3. 同步資料庫 Schema
+> **不需要設定** `PORT`（Render 自動分配）和 `FRONTEND_URL`（合併部署不需要）。
 
-```bash
-railway run npx prisma db push
-railway run npx prisma generate
-```
+### 3. 點擊 Deploy
 
-## 前端部署 (Vercel)
+Render 會自動執行：
+1. `npm run render:build` — 安裝前後端依賴 → 編譯 Angular → 編譯 TypeScript
+2. `npm start` — 啟動 Express，同時 serve API 和前端靜態檔
 
-### 1. 安裝 Vercel CLI
+部署完成後，你會得到一個網址：`https://your-app.onrender.com`
 
-```bash
-npm i -g vercel
-```
+### 4. 同步資料庫
 
-### 2. 部署
-
-```bash
-cd frontend
-
-# 前端不需要額外設定環境變數
-# Google Client ID 等設定會自動從後端 /api/config 取得
-# 只需確認 environment.prod.ts 中的 apiUrl 指向你的後端 URL
-
-# 建置
-ng build --configuration production
-
-# 部署
-vercel
-```
-
-### 3. 環境設定
-
-前端的 `src/environments/environment.prod.ts` 只需設定 `apiUrl`：
-
-```typescript
-export const environment = {
-  production: true,
-  apiUrl: "https://your-backend-domain.railway.app/api",
-};
-```
-
-所有個人化設定（Google Client ID、Admin Emails）都由後端統一提供。
-
-## Google OAuth 設定
-
-### 1. 建立 Google Cloud 專案
-
-1. 前往 [Google Cloud Console](https://console.cloud.google.com/)
-2. 建立新專案
-3. 啟用 "Google+ API"
-
-### 2. 建立 OAuth 認證
-
-1. 前往 "APIs & Services" > "Credentials"
-2. 建立 OAuth 2.0 Client ID
-3. 應用程式類型: Web application
-4. 授權的 JavaScript 來源:
-   - `http://localhost:4444` (開發環境)
-   - `https://your-frontend-domain.vercel.app` (正式環境)
-5. 授權的重新導向 URI:
-   - `http://localhost:4444` (開發環境)
-   - `https://your-frontend-domain.vercel.app` (正式環境)
-
-### 3. 取得憑證
-
-- 複製 Client ID
-- 將它設定到後端環境變數 `GOOGLE_CLIENT_ID`
-- 前端會自動從 `/api/config` 取得，不需要額外設定
-
-## 資料庫初始設定
-
-部署完成後,使用 Prisma Studio 建立第一個 RevealConfig:
-
-```bash
-# 連線到資料庫
-railway run npx prisma studio
-```
-
-在 Prisma Studio 中:
-
-1. 開啟 RevealConfig 表
-2. 新增一筆記錄,所有欄位保持預設值
-
-## 測試
-
-1. 訪問前端網址
-2. 使用 Google 登入
-3. 測試下注功能
-4. 檢查統計是否正確更新
-
-## 監控
-
-### Railway
-
-- 查看後端 logs: `railway logs`
-- 監控資源使用
-
-### Vercel
-
-- 在 Dashboard 查看部署狀態
-- 檢查 Analytics
-
-### MongoDB Atlas
-
-- 在 Atlas Dashboard 監控連線數
-- 查看資料庫效能指標
-
-## 常見問題
-
-### CORS 錯誤
-
-- 確認後端 `FRONTEND_URL` 環境變數正確
-- 檢查前端是否使用 `withCredentials: true`
-
-### Google 登入失敗
-
-- 確認 Google OAuth 設定的網址正確
-- 檢查 Client ID 是否正確設定
-
-### 資料庫連線失敗
-
-- 檢查 `DATABASE_URL` 格式 (MongoDB 連線字串)
-- 確認 MongoDB Atlas Network Access 設定正確
-- 確認已執行 `npx prisma db push`
-
-## 維護
-
-### 更新後端
+首次部署後，如果 Schema 還沒同步：
 
 ```bash
 cd backend
-git add .
-git commit -m "Update"
-railway up
+DATABASE_URL="你的連線字串" npx prisma db push
 ```
 
-### 更新前端
+## 自動部署
+
+設定完成後，每次 push 到 `main` 分支，Render 會自動重新部署。
 
 ```bash
-cd frontend
-ng build --configuration production
-vercel --prod
+git add .
+git commit -m "update"
+git push
+# Render 自動偵測 → 重新 build → 重啟服務
 ```
 
-### 備份資料庫
+## Build 流程說明
 
-在 MongoDB Atlas Dashboard:
+```
+npm run render:build
+  │
+  ├── npm run install:all
+  │   ├── cd backend && npm install
+  │   └── cd frontend && npm install
+  │
+  ├── npm run build:frontend
+  │   └── ng build --configuration production
+  │       → 輸出到 frontend/dist/frontend/browser/
+  │
+  └── npm run build:backend
+      ├── npx prisma generate
+      └── tsc
+          → 輸出到 backend/dist/
+```
 
-1. 進入 Database
-2. 使用內建的備份功能
-3. 或使用 `mongodump` 工具匯出資料
+Express 在正式環境會：
+- 先處理 `/api/*` 路由
+- 再 serve `frontend/dist/frontend/browser/` 靜態檔
+- 所有其他路由 fallback 到 `index.html`（SPA routing）
 
-## 成本估算
+## 免費方案注意事項
 
-- **Railway**: 免費額度 $5/月,足夠小型應用
-- **Vercel**: 免費方案,頻寬 100GB/月
-- **MongoDB Atlas**: M0 免費層 (512MB 儲存空間)
-- **總計**: 基本上免費,除非流量很大
+| 項目 | 說明 |
+|------|------|
+| ⏱️ 休眠 | 15 分鐘無流量會休眠，下次訪問等 ~30 秒喚醒 |
+| 📊 額度 | 750 小時/月（足夠 1 個服務全月運行） |
+| 🌐 流量 | 100 GB/月 |
+| 💾 空間 | 免費方案足夠 |
+
+> **活動當天提示**：提前 5 分鐘訪問網站確保已喚醒，之後不會再休眠。
+
+## 測試部署
+
+1. 訪問 `https://your-app.onrender.com`
+2. 使用 Google 登入
+3. 測試下注功能
+4. 訪問 `/admin` 測試管理功能
+5. 檢查 `/health` 確認後端正常
+
+## 常見問題
+
+### Google 登入失敗
+- 確認 Google Cloud Console 的「授權的 JavaScript 來源」有加入 Render 網址
+- 確認 `GOOGLE_CLIENT_ID` 環境變數正確
+
+### Session / 登入狀態無法保持
+- 確認 `NODE_ENV=production`（啟用 secure cookie + trust proxy）
+- 確認 `SESSION_SECRET` 已設定
+
+### 資料庫連線失敗
+- 確認 MongoDB Atlas Network Access 有 `0.0.0.0/0`
+- 確認 `DATABASE_URL` 格式正確（包含帳號密碼和資料庫名稱）
+
+### 頁面空白（前端沒載入）
+- 檢查 Render logs，確認 build 過程有成功編譯 Angular
+- 確認 `npm run render:build` 有正確執行
 
 ## 安全建議
 
-1. 定期更新 `SESSION_SECRET`
-2. 使用 HTTPS (Vercel/Railway 自動提供)
-3. 設定適當的 CORS 來源
-4. 定期備份資料庫
-5. 監控異常登入活動
-6. 在 MongoDB Atlas 設定 IP 白名單
+1. **SESSION_SECRET**: 使用強密碼（Render 可自動產生）
+2. **HTTPS**: Render 自動提供 SSL 憑證
+3. **MongoDB**: 正式上線後考慮限制 IP 白名單（需升級 Render 付費方案取得固定 IP）
+4. **環境變數**: 絕不提交 `.env` 到 Git
+5. **定期備份**: 在 MongoDB Atlas Dashboard 設定備份排程

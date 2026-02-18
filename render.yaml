@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: gender-reveal-bet
+    runtime: node
+    plan: free
+    buildCommand: npm run render:build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false  # 手動在 Render Dashboard 設定
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: ADMIN_EMAILS
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true  # Render 自動產生隨機值
