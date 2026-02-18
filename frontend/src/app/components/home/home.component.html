@@ -139,17 +139,25 @@
     } @else {
       <div class="login-section">
         <p>登入後即可參與下注！</p>
-        <div class="login-buttons">
-          @if (!authService.showGoogleRenderedBtn()) {
-            <button (click)="loginWithGoogle()" class="btn btn-google">
-              <span class="icon">G</span> 使用 Google 登入
+        @if (authService.isInAppBrowser()) {
+          <div class="webview-warning">
+            <p>⚠️ LINE / Facebook 內建瀏覽器不支援 Google 登入</p>
+            <p>請點右上角選單「⋯」→「<strong>用瀏覽器開啟</strong>」</p>
+            <button class="btn btn-primary" (click)="copyLink()">📋 複製連結</button>
+          </div>
+        } @else {
+          <div class="login-buttons">
+            @if (!authService.showGoogleRenderedBtn()) {
+              <button (click)="loginWithGoogle()" class="btn btn-google">
+                <span class="icon">G</span> 使用 Google 登入
+              </button>
+            }
+            <div id="google-signin-btn" [class.hidden]="!authService.showGoogleRenderedBtn()"></div>
+            <button (click)="loginWithLine()" class="btn btn-line" disabled title="即將推出">
+              <span class="icon">L</span> 使用 LINE 登入（即將推出）
             </button>
-          }
-          <div id="google-signin-btn" [class.hidden]="!authService.showGoogleRenderedBtn()"></div>
-          <button (click)="loginWithLine()" class="btn btn-line" disabled title="即將推出">
-            <span class="icon">L</span> 使用 LINE 登入（即將推出）
-          </button>
-        </div>
+          </div>
+        }
       </div>
     }
   </section>

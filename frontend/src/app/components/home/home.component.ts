@@ -67,6 +67,12 @@ export class HomeComponent implements OnInit {
     this.authService.loginWithLine();
   }
 
+  copyLink(): void {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      alert('已複製連結！請開啟瀏覽器貼上網址');
+    });
+  }
+
   logout(): void {
     this.authService.logout().subscribe({
       next: () => console.log('Logged out successfully'),

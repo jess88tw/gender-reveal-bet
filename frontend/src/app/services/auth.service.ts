@@ -23,6 +23,12 @@ export class AuthService {
   private showGoogleRenderedBtnSignal = signal(false);
   readonly showGoogleRenderedBtn = this.showGoogleRenderedBtnSignal.asReadonly();
 
+  // 偵測是否在 WebView（LINE / Facebook 內建瀏覽器）中
+  // Google 禁止在 WebView 中進行 OAuth 登入
+  readonly isInAppBrowser = signal(
+    /Line\/|FBAN|FBAV/i.test(navigator.userAgent)
+  );
+
   // 公開的 computed signals
   readonly currentUser = this.currentUserSignal.asReadonly();
   readonly isLoggedIn = computed(() => this.currentUserSignal() !== null);
