@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AdminService } from '../../services/admin.service';
 import { AuthService } from '../../services/auth.service';
 import { Bet, RevealConfig } from '../../models/types';
@@ -15,6 +15,7 @@ import { Bet, RevealConfig } from '../../models/types';
 export class AdminComponent implements OnInit {
   private adminService = inject(AdminService);
   private authService = inject(AuthService);
+  private router = inject(Router);
 
   isLoggedIn = this.authService.isLoggedIn;
   currentUser = this.authService.currentUser;
@@ -130,11 +131,13 @@ export class AdminComponent implements OnInit {
     this.actionLoading.set(true);
     this.adminService.clearData().subscribe({
       next: (res) => {
-        this.successMessage.set(
-          `已清空：${res.deleted.users} 位使用者、${res.deleted.bets} 筆下注、${res.deleted.revealConfig} 筆揭曉設定`
+        // 清空資料後，後端 session 已銷毀，前端也需清除登入狀態
+        this.authService.clearUser();
+        alert(
+          `已清空：${res.deleted.users} 位使用者、${res.deleted.bets} 筆下注、${res.deleted.revealConfig} 筆揭曉設定\n\n將返回首頁，請重新登入。`
         );
         this.actionLoading.set(false);
-        this.loadData();
+        this.router.navigate(['/']);
       },
       error: (err) => {
         this.error.set(err.error?.error || '清空資料失敗');

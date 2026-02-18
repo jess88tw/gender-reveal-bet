@@ -118,4 +118,14 @@ export class AuthService {
   setUser(user: User): void {
     this.currentUserSignal.set(user);
   }
+
+  /** 清除前端登入狀態（不呼叫後端 API，用於 session 已被後端銷毀的場景） */
+  clearUser(): void {
+    this.currentUserSignal.set(null);
+    try {
+      google.accounts.id.disableAutoSelect();
+    } catch {
+      // Google SDK 可能尚未載入
+    }
+  }
 }

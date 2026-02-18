@@ -192,13 +192,19 @@ router.post('/clear-data', requireAuth, requireAdmin, async (req: Request, res: 
     const config = await prisma.revealConfig.deleteMany();
     const users = await prisma.user.deleteMany();
 
-    res.json({
-      message: 'All data cleared',
-      deleted: {
-        bets: bets.count,
-        revealConfig: config.count,
-        users: users.count,
-      },
+    // 清空資料後銷毀 session，避免 userId 指向已刪除的使用者
+    req.session.destroy((err) => {
+      if (err) {
+        console.error('Session destroy error after clear-data:', err);
+      }
+      res.json({
+        message: 'All data cleared',
+        deleted: {
+          bets: bets.count,
+          revealConfig: config.count,
+          users: users.count,
+        },
+      });
     });
   } catch (error) {
     console.error('Clear data error:', error);
