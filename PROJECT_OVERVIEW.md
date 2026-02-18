@@ -13,11 +13,12 @@ gender-reveal-bet/
 │   │   └── schema.prisma   # 資料庫 Schema (MongoDB)
 │   ├── src/
 │   │   ├── routes/         # API 路由
-│   │   │   ├── auth.ts    # 認證相關 (Google Identity Services)
-│   │   │   ├── bets.ts    # 下注相關
-│   │   │   ├── clues.ts   # 線索相關
-│   │   │   ├── admin.ts   # 管理功能
-│   │   │   └── config.ts  # 公開設定 API
+│   │   │   ├── auth.ts     # 認證相關 (Google Identity Services)
+│   │   │   ├── bets.ts     # 下注相關
+│   │   │   ├── clues.ts    # 線索相關
+│   │   │   ├── symptoms.ts # 孕徵對照 CRUD
+│   │   │   ├── admin.ts    # 管理功能
+│   │   │   └── config.ts   # 公開設定 API
 │   │   ├── middleware/     # 中間件 (auth, admin)
 │   │   ├── lib/           # 工具函式 (prisma client)
 │   │   └── index.ts       # 主程式
@@ -78,29 +79,35 @@ backend/.env  ──→  GET /api/config  ──→  前端 ConfigService (APP_I
   - 參與者列表
 - ✅ 線索管理
   - CRUD 操作
+- ✅ 孕徵對照系統
+  - 預設 9 項孕徵初始化（肚型、皮膚、喜食口味等）
+  - 管理員切換 BOY/GIRL 勾選
+  - 新增/刪除自訂孕徵
+  - 爸媽預測設定（dadPrediction / momPrediction）
 - ✅ 管理功能
   - 查看所有下注 / 付款確認
   - 性別揭曉
   - 抽獎系統（猜對者中抽一位，獎金扣 10% 手續費）
   - 揭曉狀態 API（`GET /api/admin/reveal-status` — 含得獎者資訊與獎金明細）
-  - 清空資料（開發用）— 自動銷毀 Session 避免殘留登入狀態
+  - 爸媽預測更新（`PATCH /admin/predictions`）
+  - 清空資料（開發用，含孕徵）— 自動銷毀 Session 避免殘留登入狀態
 
 ### 前端介面
 
 - ✅ 首頁 (`home.component`) - 統計顯示 + 管理員入口 + 揭曉動態效果（性別色彩變化）+ 得獎者公告卡片 + 揭曉後「敬請期待」提示 + 每 30 秒自動更新狀態
 - ✅ 下注頁面 (`betting.component`) - 選擇性別，固定 NT$200 + 三種付款方式專屬成功畫面（銀行轉帳/LINE Pay/現金）
 - ✅ 我的下注 (`my-bets.component`) - Hero 下注卡片 + 付款方式專屬提醒 + 下注詳情
-- ✅ 線索頁面 (`clues.component`) - 顯示所有線索
+- ✅ 線索頁面 (`clues.component`) - Boy or Girl 孕徵對照卡片（深色主題、BOY/GIRL 計分條、爸媽預測標籤）+ 其他線索卡片 + 揭曉後隱藏下注按鈕
 - ✅ 參與者列表 (`participants.component`) - 顯示性別選擇
-- ✅ 管理後台 (`admin.component`) - 付款確認、揭曉、抽獎、清除資料 + 得獎資訊持久化 + 清除資料時自動登出並導向首頁
+- ✅ 管理後台 (`admin.component`) - 付款確認、揭曉、抽獎、孕徵管理（toggle / 新增 / 刪除 / 初始化）、爸媽預測設定、清除資料 + 得獎資訊持久化 + 清除資料時自動登出並導向首頁
 
 ### 前端服務
 
 - ✅ 設定服務 (`config.service.ts`) - 啟動時從後端載入設定，使用 `APP_INITIALIZER`
 - ✅ 認證服務 (`auth.service.ts`) - Google GIS 登入，使用 signals + 取消登入不破版 + `clearUser()` 方法
 - ✅ 下注服務 (`bet.service.ts`) - 使用 signals + 揭曉狀態查詢 + 得獎者/獎金資訊
-- ✅ 線索服務 (`clue.service.ts`) - 使用 signals
-- ✅ 管理服務 (`admin.service.ts`) - 使用 signals + 得獎者/獎金持久化 signals
+- ✅ 線索服務 (`clue.service.ts`) - 使用 signals + 孕徵 CRUD（getSymptoms、initSymptoms、toggleSymptom、createSymptom、deleteSymptom）
+- ✅ 管理服務 (`admin.service.ts`) - 使用 signals + 得獎者/獎金持久化 signals + 爸媽預測更新
 
 ### 資料庫
 
@@ -108,7 +115,8 @@ backend/.env  ──→  GET /api/config  ──→  前端 ConfigService (APP_I
 - ✅ User 表（支援 Google 登入）
 - ✅ Bet 表（userId @unique — 每人限一注）
 - ✅ Clue 表
-- ✅ RevealConfig 表
+- ✅ RevealConfig 表（含 dadPrediction / momPrediction）
+- ✅ Symptom 表（category、boyDescription、girlDescription、checkedGender、order）
 
 ## 🚧 待完成功能
 
