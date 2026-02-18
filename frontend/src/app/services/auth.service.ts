@@ -84,7 +84,7 @@ export class AuthService {
         ux_mode: 'redirect',
       });
     } else {
-      // 桌面端：使用 popup 模式，按鈕點擊觸發
+      // 桌面端：使用 popup 模式
       google.accounts.id.initialize({
         client_id: this.configService.googleClientId(),
         callback: (response: any) => {
@@ -93,9 +93,29 @@ export class AuthService {
           });
         },
       });
+
+      // 先嘗試 One Tap（不使用 FedCM），失敗才 fallback 到按鈕
+      google.accounts.id.prompt((notification: any) => {
+        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+          this.ngZone.run(() => this.showGoogleRenderedBtnSignal.set(true));
+          setTimeout(() => {
+            const btnEl = document.getElementById('google-signin-btn');
+            if (btnEl) {
+              google.accounts.id.renderButton(btnEl, {
+                theme: 'outline',
+                size: 'large',
+                text: 'signin_with',
+                locale: 'zh-TW',
+                width: 280,
+              });
+            }
+          });
+        }
+      });
+      return;
     }
 
-    // 不使用 One Tap / FedCM（容易被瀏覽器封鎖），直接顯示 Google 原生按鈕
+    // 手機端：直接顯示 Google 原生按鈕（redirect 模式）
     this.ngZone.run(() => this.showGoogleRenderedBtnSignal.set(true));
     setTimeout(() => {
       const btnEl = document.getElementById('google-signin-btn');
