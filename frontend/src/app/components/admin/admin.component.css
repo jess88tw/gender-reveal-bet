@@ -184,6 +184,12 @@
   white-space: nowrap;
 }
 
+.bet-payment-method {
+  font-size: 0.85rem;
+  color: #aaa;
+  white-space: nowrap;
+}
+
 .bet-date {
   color: #888;
   font-size: 0.8rem;

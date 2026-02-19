@@ -78,6 +78,14 @@
               <div class="bet-amount">
                 NT$ {{ bet.amount | number }}
               </div>
+              <div class="bet-payment-method">
+                @switch (bet.paymentMethod) {
+                  @case ('bank_transfer') { 🏦 銀行轉帳 }
+                  @case ('line_pay') { 💚 LINE Pay }
+                  @case ('cash') { 💵 現金 }
+                  @default { ❓ 未選擇 }
+                }
+              </div>
               <div class="bet-date">
                 {{ bet.createdAt | date:'MM/dd HH:mm' }}
               </div>
